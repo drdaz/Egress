@@ -34,7 +34,9 @@ struct VPNStatusProvider: TimelineProvider {
                 serverLocation: "wireguard",
                 country: "Sweden",
                 city: "Stockholm",
-                organization: "Mullvad VPN"
+                organization: "Mullvad VPN",
+                providerName: "Mullvad",
+                serverName: "se-sto-wg-001"
             )
         )
     }
@@ -143,10 +145,23 @@ struct SmallVPNWidgetView: View {
                     .font(.caption)
                     .fontWeight(.semibold)
                 
-                if status.isConnected, let country = status.country {
-                    Text(country)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                if status.isConnected {
+                    if let provider = status.providerName {
+                        Text(provider)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    
+                    if let server = status.serverName {
+                        Text(server)
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                            .lineLimit(1)
+                    } else if let country = status.country {
+                        Text(country)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
             .padding()
@@ -189,15 +204,30 @@ struct MediumVPNWidgetView: View {
                     .foregroundStyle(status.isConnected ? .green : .red)
                 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(status.isConnected ? "VPN Connected" : "VPN Disconnected")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                    
                     if status.isConnected {
+                        if let provider = status.providerName {
+                            Text("Connected to \(provider)")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                        } else {
+                            Text("VPN Connected")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                        }
+                        
+                        if let server = status.serverName {
+                            Text("Server: \(server)")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        
                         Text(status.locationDescription)
-                            .font(.subheadline)
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                     } else {
+                        Text("VPN Disconnected")
+                            .font(.headline)
+                            .fontWeight(.bold)
                         Text("IP: \(status.ipAddress)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -236,7 +266,9 @@ struct MediumVPNWidgetView: View {
             serverLocation: "wireguard",
             country: "Sweden",
             city: "Stockholm",
-            organization: "Mullvad VPN"
+            organization: "Mullvad VPN",
+            providerName: "Mullvad",
+            serverName: "se-sto-wg-001"
         )
     )
     VPNStatusEntry(
@@ -247,7 +279,9 @@ struct MediumVPNWidgetView: View {
             serverLocation: nil,
             country: "United States",
             city: "New York",
-            organization: "ISP Corp"
+            organization: "ISP Corp",
+            providerName: nil,
+            serverName: nil
         )
     )
 }
@@ -263,7 +297,9 @@ struct MediumVPNWidgetView: View {
             serverLocation: "wireguard",
             country: "Sweden",
             city: "Stockholm",
-            organization: "Mullvad VPN"
+            organization: "Mullvad VPN",
+            providerName: "Mullvad",
+            serverName: "se-sto-wg-001"
         )
     )
 }

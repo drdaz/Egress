@@ -9,7 +9,6 @@ import Foundation
 internal import Combine
 
 /// Service class for checking VPN status
-@MainActor
 class VPNStatusChecker: ObservableObject {
     @Published var currentStatus: VPNStatus?
     @Published var isLoading = false
@@ -22,21 +21,22 @@ class VPNStatusChecker: ObservableObject {
     }
     
     func checkStatus() async {
-        isLoading = true
-        errorMessage = nil
+        await MainActor.run { isLoading = true }
+        await MainActor.run { errorMessage = nil }
         
         do {
             let status = try await provider.checkStatus()
-            currentStatus = status
+            await MainActor.run { currentStatus = status }
         } catch {
-            errorMessage = error.localizedDescription
+            await MainActor.run { errorMessage = error.localizedDescription }
         }
         
-        isLoading = false
+        await MainActor.run { isLoading = false }
     }
     
     /// Static method for use in widgets (which can't use @MainActor easily)
-    static func checkStatus(using provider: VPNProvider = MullvadProvider()) async throws -> VPNStatus {
-        return try await provider.checkStatus()
+    static func checkStatus(using provider: VPNProvider? = nil) async throws -> VPNStatus {
+        let actualProvider = provider ?? MullvadProvider()
+        return try await actualProvider.checkStatus()
     }
 }

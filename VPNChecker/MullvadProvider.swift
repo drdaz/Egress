@@ -29,7 +29,9 @@ struct MullvadProvider: VPNProvider {
                 serverLocation: mullvadResponse.mullvadServerType,
                 country: mullvadResponse.country,
                 city: mullvadResponse.city,
-                organization: mullvadResponse.organization
+                organization: mullvadResponse.organization,
+                providerName: mullvadResponse.mullvadExitIP ? providerName : nil,
+                serverName: mullvadResponse.mullvadExitIPHostname
             )
         } catch {
             throw VPNProviderError.decodingError(error)
@@ -46,6 +48,7 @@ private struct MullvadResponse: Codable {
     let organization: String
     let mullvadExitIP: Bool
     let mullvadServerType: String?
+    let mullvadExitIPHostname: String?
     
     enum CodingKeys: String, CodingKey {
         case ip
@@ -54,5 +57,6 @@ private struct MullvadResponse: Codable {
         case organization
         case mullvadExitIP = "mullvad_exit_ip"
         case mullvadServerType = "mullvad_server_type"
+        case mullvadExitIPHostname = "mullvad_exit_ip_hostname"
     }
 }

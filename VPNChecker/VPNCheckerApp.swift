@@ -160,8 +160,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if let statusItem = menu.items.first(where: { $0.tag == 999 }) {
                 if let status = checker.currentStatus {
                     let icon = status.isConnected ? "✅" : "❌"
-                    let location = status.isConnected ? status.locationDescription : "Not Connected"
-                    statusItem.title = "\(icon) \(location)"
+                    statusItem.title = "\(icon) \(status.detailedDescription)"
                 } else if let error = checker.errorMessage {
                     statusItem.title = "⚠️ \(error)"
                 } else {

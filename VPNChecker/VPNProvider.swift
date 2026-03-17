@@ -15,6 +15,8 @@ struct VPNStatus: Codable, Equatable {
     let country: String?
     let city: String?
     let organization: String?
+    let providerName: String?
+    let serverName: String?
     
     var locationDescription: String {
         if let city = city, let country = country {
@@ -25,6 +27,30 @@ struct VPNStatus: Codable, Equatable {
             return location
         }
         return "Unknown"
+    }
+    
+    var detailedDescription: String {
+        guard isConnected else { return "Not Connected" }
+        
+        var parts: [String] = []
+        
+        if let provider = providerName {
+            parts.append("Connected to \(provider)")
+        }
+        
+        if let server = serverName {
+            parts.append(server)
+        } else if let location = serverLocation {
+            parts.append(location)
+        }
+        
+        if let city = city, let country = country {
+            parts.append("\(city), \(country)")
+        } else if let country = country {
+            parts.append(country)
+        }
+        
+        return parts.isEmpty ? "Connected" : parts.joined(separator: " - ")
     }
 }
 

@@ -121,6 +121,102 @@ Sometimes Xcode needs a clean build:
 
 ---
 
+## Solution 5a: Force Widget Cache Refresh (macOS) ⭐ FOR STUBBBORN WIDGETS
+
+**If your widget won't show updated UI on macOS even after rebuilding**, the system is aggressively caching the old widget. Here's how to force a refresh:
+
+### Method 1: Kill the Widget Process (Quickest)
+
+1. Open **Activity Monitor**
+2. Search for your app name (e.g., "VPNChecker")
+3. Find the process named something like `VPNCheckerWidgetExtension` or just your widget name
+4. Select it and click the **Stop** button (⏹)
+5. The widget will automatically restart and reload
+
+### Method 2: Terminal Command (Nuclear Option)
+
+```bash
+# Kill the widget process
+killall -9 "VPNCheckerWidgetExtension"
+
+# Or kill all widget processes
+killall -9 widgetkit-agent
+
+# Then remove widget from desktop and re-add it
+```
+
+### Method 3: Complete Widget Reset (Most Thorough)
+
+```bash
+# Stop the app
+killall "VPNChecker"
+
+# Clean build folder in Xcode (⇧⌘K)
+# Then in Terminal:
+
+# Clear derived data
+rm -rf ~/Library/Developer/Xcode/DerivedData
+
+# Kill widget processes
+killall -9 widgetkit-agent
+
+# Rebuild and run from Xcode
+# Remove widget from desktop
+# Re-add widget
+```
+
+### Method 4: Change Widget Kind (Temporary Hack)
+
+If nothing else works, force macOS to see it as a "new" widget:
+
+```swift
+struct VPNCheckerWidget: Widget {
+    let kind: String = "VPNCheckerWidget2"  // Change this number
+    // ...
+}
+```
+
+Clean, rebuild, and the widget will appear as new to macOS. Remember to remove old widgets from desktop.
+
+### Method 5: Verify Widget Extension Is Running New Code
+
+Add a temporary visual indicator to confirm new code is running:
+
+```swift
+struct SmallVPNWidgetView: View {
+    let entry: VPNStatusEntry
+    
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            // Your existing widget content here...
+            
+            // TEMPORARY: Version indicator
+            Text("v2")  // Change this each build
+                .font(.caption2)
+                .foregroundStyle(.red)
+                .padding(4)
+        }
+    }
+}
+```
+
+If the version number doesn't change, the cache is still being used.
+
+### Why This Happens on macOS
+
+macOS caches widget snapshots very aggressively for performance. Unlike iOS, where widgets refresh more readily, macOS desktop widgets can "stick" to old code even across rebuilds because:
+
+1. The widget extension process keeps running
+2. Cached snapshots aren't invalidated
+3. The widget timeline hasn't forced a refresh
+
+**After trying any method above, always:**
+1. Remove the widget from desktop
+2. Wait 5 seconds
+3. Re-add the widget
+
+---
+
 ## Solution 6: Check Simulator/Device Settings
 
 ### iOS/iPadOS Simulator:
