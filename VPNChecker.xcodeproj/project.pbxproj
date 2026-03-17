@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		BC1DF2C52F66FDF800A191B9 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC1DF2C42F66FDF800A191B9 /* WidgetKit.framework */; };
+		BC1DF2C72F66FDF800A191B9 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC1DF2C62F66FDF800A191B9 /* SwiftUI.framework */; };
+		BC1DF2D22F66FDF900A191B9 /* VPNCheckerWidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC1DF2C22F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		BC1DF28E2F65CC8A00A191B9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,17 +27,63 @@
 			remoteGlobalIDString = BC1DF27F2F65CC8900A191B9;
 			remoteInfo = VPNChecker;
 		};
+		BC1DF2D02F66FDF900A191B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BC1DF2782F65CC8900A191B9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BC1DF2C12F66FDF800A191B9;
+			remoteInfo = VPNCheckerWidgetExtensionExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BC1DF2D72F66FDF900A191B9 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BC1DF2D22F66FDF900A191B9 /* VPNCheckerWidgetExtensionExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		BC1DF2802F65CC8900A191B9 /* VPNChecker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VPNChecker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC1DF28D2F65CC8A00A191B9 /* VPNCheckerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VPNCheckerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC1DF2972F65CC8A00A191B9 /* VPNCheckerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VPNCheckerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC1DF2C22F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = VPNCheckerWidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC1DF2C42F66FDF800A191B9 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = /System/Library/Frameworks/WidgetKit.framework; sourceTree = "<absolute>"; };
+		BC1DF2C62F66FDF800A191B9 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = /System/Library/Frameworks/SwiftUI.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BC1DF2D32F66FDF900A191B9 /* Exceptions for "VPNCheckerWidgetExtension" folder in "VPNCheckerWidgetExtensionExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BC1DF2C12F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension */;
+		};
+		BC1DF2D92F66FE2F00A191B9 /* Exceptions for "VPNChecker" folder in "VPNCheckerWidgetExtensionExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				MullvadProvider.swift,
+				VPNProvider.swift,
+				VPNStatusChecker.swift,
+			);
+			target = BC1DF2C12F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		BC1DF2822F65CC8900A191B9 /* VPNChecker */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BC1DF2D92F66FE2F00A191B9 /* Exceptions for "VPNChecker" folder in "VPNCheckerWidgetExtensionExtension" target */,
+			);
 			path = VPNChecker;
 			sourceTree = "<group>";
 		};
@@ -43,6 +95,14 @@
 		BC1DF29A2F65CC8A00A191B9 /* VPNCheckerUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = VPNCheckerUITests;
+			sourceTree = "<group>";
+		};
+		BC1DF2C82F66FDF800A191B9 /* VPNCheckerWidgetExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BC1DF2D32F66FDF900A191B9 /* Exceptions for "VPNCheckerWidgetExtension" folder in "VPNCheckerWidgetExtensionExtension" target */,
+			);
+			path = VPNCheckerWidgetExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -69,6 +129,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BC1DF2BF2F66FDF800A191B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC1DF2C72F66FDF800A191B9 /* SwiftUI.framework in Frameworks */,
+				BC1DF2C52F66FDF800A191B9 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -78,6 +147,8 @@
 				BC1DF2822F65CC8900A191B9 /* VPNChecker */,
 				BC1DF2902F65CC8A00A191B9 /* VPNCheckerTests */,
 				BC1DF29A2F65CC8A00A191B9 /* VPNCheckerUITests */,
+				BC1DF2C82F66FDF800A191B9 /* VPNCheckerWidgetExtension */,
+				BC1DF2C32F66FDF800A191B9 /* Frameworks */,
 				BC1DF2812F65CC8900A191B9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,8 +159,18 @@
 				BC1DF2802F65CC8900A191B9 /* VPNChecker.app */,
 				BC1DF28D2F65CC8A00A191B9 /* VPNCheckerTests.xctest */,
 				BC1DF2972F65CC8A00A191B9 /* VPNCheckerUITests.xctest */,
+				BC1DF2C22F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		BC1DF2C32F66FDF800A191B9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BC1DF2C42F66FDF800A191B9 /* WidgetKit.framework */,
+				BC1DF2C62F66FDF800A191B9 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -102,10 +183,12 @@
 				BC1DF27C2F65CC8900A191B9 /* Sources */,
 				BC1DF27D2F65CC8900A191B9 /* Frameworks */,
 				BC1DF27E2F65CC8900A191B9 /* Resources */,
+				BC1DF2D72F66FDF900A191B9 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				BC1DF2D12F66FDF900A191B9 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				BC1DF2822F65CC8900A191B9 /* VPNChecker */,
@@ -163,6 +246,28 @@
 			productReference = BC1DF2972F65CC8A00A191B9 /* VPNCheckerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		BC1DF2C12F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BC1DF2D42F66FDF900A191B9 /* Build configuration list for PBXNativeTarget "VPNCheckerWidgetExtensionExtension" */;
+			buildPhases = (
+				BC1DF2BE2F66FDF800A191B9 /* Sources */,
+				BC1DF2BF2F66FDF800A191B9 /* Frameworks */,
+				BC1DF2C02F66FDF800A191B9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				BC1DF2C82F66FDF800A191B9 /* VPNCheckerWidgetExtension */,
+			);
+			name = VPNCheckerWidgetExtensionExtension;
+			packageProductDependencies = (
+			);
+			productName = VPNCheckerWidgetExtensionExtension;
+			productReference = BC1DF2C22F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -184,6 +289,9 @@
 						CreatedOnToolsVersion = 26.3;
 						TestTargetID = BC1DF27F2F65CC8900A191B9;
 					};
+					BC1DF2C12F66FDF800A191B9 = {
+						CreatedOnToolsVersion = 26.3;
+					};
 				};
 			};
 			buildConfigurationList = BC1DF27B2F65CC8900A191B9 /* Build configuration list for PBXProject "VPNChecker" */;
@@ -203,6 +311,7 @@
 				BC1DF27F2F65CC8900A191B9 /* VPNChecker */,
 				BC1DF28C2F65CC8A00A191B9 /* VPNCheckerTests */,
 				BC1DF2962F65CC8A00A191B9 /* VPNCheckerUITests */,
+				BC1DF2C12F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -223,6 +332,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BC1DF2952F65CC8A00A191B9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC1DF2C02F66FDF800A191B9 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -253,6 +369,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BC1DF2BE2F66FDF800A191B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -265,6 +388,11 @@
 			isa = PBXTargetDependency;
 			target = BC1DF27F2F65CC8900A191B9 /* VPNChecker */;
 			targetProxy = BC1DF2982F65CC8A00A191B9 /* PBXContainerItemProxy */;
+		};
+		BC1DF2D12F66FDF900A191B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BC1DF2C12F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension */;
+			targetProxy = BC1DF2D02F66FDF900A191B9 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -395,9 +523,20 @@
 				DEVELOPMENT_TEAM = 83EQM3242U;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -439,9 +578,20 @@
 				DEVELOPMENT_TEAM = 83EQM3242U;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -575,6 +725,110 @@
 			};
 			name = Release;
 		};
+		BC1DF2D52F66FDF900A191B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83EQM3242U;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VPNCheckerWidgetExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = VPNCheckerWidgetExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.montnoir.VPNChecker.VPNCheckerWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Debug;
+		};
+		BC1DF2D62F66FDF900A191B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83EQM3242U;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VPNCheckerWidgetExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = VPNCheckerWidgetExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.montnoir.VPNChecker.VPNCheckerWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -610,6 +864,15 @@
 			buildConfigurations = (
 				BC1DF2A82F65CC8A00A191B9 /* Debug */,
 				BC1DF2A92F65CC8A00A191B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BC1DF2D42F66FDF900A191B9 /* Build configuration list for PBXNativeTarget "VPNCheckerWidgetExtensionExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC1DF2D52F66FDF900A191B9 /* Debug */,
+				BC1DF2D62F66FDF900A191B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
