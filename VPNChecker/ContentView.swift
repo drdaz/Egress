@@ -75,10 +75,6 @@ struct VPNStatusView: View {
             VStack(alignment: .leading, spacing: 12) {
                 InfoRow(label: "IP Address", value: status.ipAddress)
                 
-                if let provider = status.providerName {
-                    InfoRow(label: "Provider", value: provider)
-                }
-                
                 if let server = status.serverName {
                     InfoRow(label: "Server", value: server)
                 }

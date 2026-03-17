@@ -63,9 +63,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @objc func statusBarButtonClicked() {
-        guard let button = statusItem?.button else { return }
+        guard (statusItem?.button) != nil else { return }
         
-        if let menu = statusItem?.menu {
+        if (statusItem?.menu) != nil {
             statusItem?.menu = nil
             // Toggle behavior: click shows menu
         } else {
@@ -140,14 +140,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         await checker.checkStatus()
         
         let imageName: String
+        let tooltipText: String
+        
         if let status = checker.currentStatus {
             imageName = status.isConnected ? "lock.shield.fill" : "lock.open.fill"
+            tooltipText = status.multilineDescription
+        } else if let error = checker.errorMessage {
+            imageName = "lock.shield"
+            tooltipText = "Error: \(error)"
         } else {
             imageName = "lock.shield"
+            tooltipText = "VPN Status"
         }
         
         await MainActor.run {
             statusItem?.button?.image = NSImage(systemSymbolName: imageName, accessibilityDescription: "VPN Status")
+            statusItem?.button?.toolTip = tooltipText
         }
         
         await updateMenuStatus()
@@ -160,7 +168,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if let statusItem = menu.items.first(where: { $0.tag == 999 }) {
                 if let status = checker.currentStatus {
                     let icon = status.isConnected ? "✅" : "❌"
-                    statusItem.title = "\(icon) \(status.detailedDescription)"
+                    statusItem.title = "\(icon) \(status.singleLineDescription)"
                 } else if let error = checker.errorMessage {
                     statusItem.title = "⚠️ \(error)"
                 } else {

@@ -146,11 +146,9 @@ struct SmallVPNWidgetView: View {
                     .fontWeight(.semibold)
                 
                 if status.isConnected {
-                    if let provider = status.providerName {
-                        Text(provider)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
+                    Text(status.providerName)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                     
                     if let server = status.serverName {
                         Text(server)
@@ -205,15 +203,9 @@ struct MediumVPNWidgetView: View {
                 
                 VStack(alignment: .leading, spacing: 6) {
                     if status.isConnected {
-                        if let provider = status.providerName {
-                            Text("Connected to \(provider)")
-                                .font(.headline)
-                                .fontWeight(.bold)
-                        } else {
-                            Text("VPN Connected")
-                                .font(.headline)
-                                .fontWeight(.bold)
-                        }
+                        Text("Connected to \(status.providerName)")
+                            .font(.headline)
+                            .fontWeight(.bold)
                         
                         if let server = status.serverName {
                             Text("Server: \(server)")
@@ -280,7 +272,7 @@ struct MediumVPNWidgetView: View {
             country: "United States",
             city: "New York",
             organization: "ISP Corp",
-            providerName: nil,
+            providerName: "None",
             serverName: nil
         )
     )

@@ -30,7 +30,7 @@ struct MullvadProvider: VPNProvider {
                 country: mullvadResponse.country,
                 city: mullvadResponse.city,
                 organization: mullvadResponse.organization,
-                providerName: mullvadResponse.mullvadExitIP ? providerName : nil,
+                providerName: mullvadResponse.mullvadExitIP ? providerName : "None",
                 serverName: mullvadResponse.mullvadExitIPHostname
             )
         } catch {
