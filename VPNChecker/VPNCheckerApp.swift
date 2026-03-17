@@ -20,7 +20,7 @@ struct VPNCheckerApp: App {
         }
         #else
         // macOS: Menu bar app with optional window
-        WindowGroup {
+        WindowGroup(id: "main") {
             ContentView()
         }
         .commands {
@@ -84,7 +84,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem.separator())
         
         menu.addItem(NSMenuItem(title: "Refresh", action: #selector(refreshStatus), keyEquivalent: "r"))
-        menu.addItem(NSMenuItem(title: "Open Window", action: #selector(openWindow), keyEquivalent: "o"))
+        menu.addItem(NSMenuItem(title: "Open", action: #selector(openWindow), keyEquivalent: "o"))
         
         menu.addItem(NSMenuItem.separator())
         
@@ -108,9 +108,32 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @objc func openWindow() {
         NSApplication.shared.activate(ignoringOtherApps: true)
-        if let window = NSApplication.shared.windows.first {
+        
+        // First, try to find and activate an existing window
+        if let window = NSApplication.shared.windows.first(where: { 
+            $0.canBecomeKey && $0.isVisible && !$0.isKind(of: NSPanel.self)
+        }) {
             window.makeKeyAndOrderFront(nil)
+            return
         }
+        
+        // If no window exists, create a new one
+        createNewWindow()
+    }
+    
+    private func createNewWindow() {
+        let contentView = ContentView()
+        let hostingController = NSHostingController(rootView: contentView)
+        
+        let window = NSWindow(contentViewController: hostingController)
+        window.title = "VPN Checker"
+        window.setContentSize(NSSize(width: 400, height: 500))
+        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+        window.center()
+        window.makeKeyAndOrderFront(nil)
+        
+        // Keep a reference so it doesn't get deallocated
+        window.isReleasedWhenClosed = false
     }
     
     private func updateMenuBarIcon() async {
