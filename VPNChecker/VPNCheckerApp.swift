@@ -23,7 +23,10 @@ struct VPNCheckerApp: App {
         // macOS: Menu bar app with optional window
         WindowGroup(id: "main") {
             ContentView()
+                .frame(width: 400, height: 500)
         }
+        .windowResizability(.contentSize)
+        .defaultSize(width: 400, height: 500)
         .commands {
             CommandGroup(replacing: .newItem) { }
         }
@@ -127,12 +130,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     private func createNewWindow() {
         let contentView = ContentView()
+            .frame(width: 400, height: 500)
         let hostingController = NSHostingController(rootView: contentView)
         
         let window = NSWindow(contentViewController: hostingController)
         window.title = "Egress"
         window.setContentSize(NSSize(width: 400, height: 500))
-        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+        window.styleMask = [.titled, .closable, .miniaturizable]
+        
+        // Set min and max size to enforce consistent sizing
+        window.minSize = NSSize(width: 400, height: 500)
+        window.maxSize = NSSize(width: 400, height: 500)
+        
         window.center()
         window.makeKeyAndOrderFront(nil)
         
