@@ -10,6 +10,7 @@ import WidgetKit
 
 struct ContentView: View {
     @StateObject private var checker = VPNStatusChecker()
+    @State private var lastChecked: Date?
     
     var body: some View {
         NavigationStack {
@@ -43,6 +44,7 @@ struct ContentView: View {
                 Button {
                     Task {
                         await checker.checkStatus()
+                        lastChecked = Date()
                         // Refresh widgets after checking status
                         WidgetCenter.shared.reloadAllTimelines()
                     }
@@ -52,11 +54,18 @@ struct ContentView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(checker.isLoading)
+                
+                if let lastChecked {
+                    Text("Last checked: \(lastChecked, format: .relative(presentation: .named, unitsStyle: .abbreviated))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
             .padding()
             .navigationTitle("VPN Checker")
             .task {
                 await checker.checkStatus()
+                lastChecked = Date()
                 // Refresh widgets when app appears
                 WidgetCenter.shared.reloadAllTimelines()
             }

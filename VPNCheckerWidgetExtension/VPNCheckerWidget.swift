@@ -128,15 +128,7 @@ struct SmallVPNWidgetView: View {
     let entry: VPNStatusEntry
     
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            widgetContent
-            
-            // DEBUG: Version indicator to verify new code is running
-            Text("v3")
-                .font(.caption2)
-                .foregroundStyle(.red)
-                .padding(4)
-        }
+        widgetContent
     }
     
     @ViewBuilder
@@ -239,10 +231,6 @@ struct MediumVPNWidgetView: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                    
-                    Text("Updated \(entry.date.formatted(.relative(presentation: .named)))")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
                 }
                 
                 Spacer()
