@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WidgetKit
 
 struct ContentView: View {
     @StateObject private var checker = VPNStatusChecker()
@@ -42,6 +43,8 @@ struct ContentView: View {
                 Button {
                     Task {
                         await checker.checkStatus()
+                        // Refresh widgets after checking status
+                        WidgetCenter.shared.reloadAllTimelines()
                     }
                 } label: {
                     Label("Check Status", systemImage: "arrow.clockwise")
@@ -54,6 +57,8 @@ struct ContentView: View {
             .navigationTitle("VPN Checker")
             .task {
                 await checker.checkStatus()
+                // Refresh widgets when app appears
+                WidgetCenter.shared.reloadAllTimelines()
             }
         }
     }

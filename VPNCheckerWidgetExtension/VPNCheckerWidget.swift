@@ -56,6 +56,7 @@ struct VPNStatusProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<VPNStatusEntry>) -> ()) {
+        print("🔄 Widget getTimeline called at \(Date())")
         Task {
             do {
                 let status = try await VPNStatusChecker.checkStatus()
@@ -63,6 +64,7 @@ struct VPNStatusProvider: TimelineProvider {
                 
                 // Refresh every 15 minutes
                 let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: Date())!
+                print("✅ Widget timeline updated, next refresh at \(nextUpdate)")
                 let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
                 completion(timeline)
             } catch {
@@ -126,7 +128,20 @@ struct SmallVPNWidgetView: View {
     let entry: VPNStatusEntry
     
     var body: some View {
-        if let error = entry.error {
+        ZStack(alignment: .topLeading) {
+            widgetContent
+            
+            // DEBUG: Version indicator to verify new code is running
+            Text("v3")
+                .font(.caption2)
+                .foregroundStyle(.red)
+                .padding(4)
+        }
+    }
+    
+    @ViewBuilder
+    private var widgetContent: some View {
+        if entry.error != nil {
             VStack(spacing: 8) {
                 Image(systemName: "exclamationmark.triangle")
                     .font(.largeTitle)

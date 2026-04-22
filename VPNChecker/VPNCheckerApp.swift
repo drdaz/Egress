@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WidgetKit
 
 @main
 struct VPNCheckerApp: App {
@@ -103,6 +104,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             await checker.checkStatus()
             await updateMenuStatus()
             await updateMenuBarIcon()
+            
+            // Refresh widgets when menu bar updates
+            WidgetCenter.shared.reloadAllTimelines()
         }
     }
     
@@ -159,6 +163,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         await updateMenuStatus()
+        
+        // Refresh widgets when status updates
+        WidgetCenter.shared.reloadAllTimelines()
     }
     
     private func updateMenuStatus() async {
