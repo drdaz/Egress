@@ -1,4 +1,4 @@
-# VPN Checker Widget
+# Egress
 
 A multiplatform iOS and macOS widget that checks whether you're connected to your VPN using the provider's web service.
 

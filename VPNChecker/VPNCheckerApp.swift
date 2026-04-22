@@ -130,7 +130,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let hostingController = NSHostingController(rootView: contentView)
         
         let window = NSWindow(contentViewController: hostingController)
-        window.title = "VPN Checker"
+        window.title = "Egress"
         window.setContentSize(NSSize(width: 400, height: 500))
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.center()
@@ -189,7 +189,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 struct SettingsView: View {
     var body: some View {
         VStack(spacing: 20) {
-            Text("VPN Checker Settings")
+            Text("Egress Settings")
                 .font(.title)
             
             Text("Status bar icon shows your VPN connection status")

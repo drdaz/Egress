@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		BC1DF2C52F66FDF800A191B9 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC1DF2C42F66FDF800A191B9 /* WidgetKit.framework */; };
 		BC1DF2C72F66FDF800A191B9 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC1DF2C62F66FDF800A191B9 /* SwiftUI.framework */; };
-		BC1DF2D22F66FDF900A191B9 /* VPNCheckerWidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC1DF2C22F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BC1DF2D22F66FDF900A191B9 /* EgressWidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC1DF2C22F66FDF800A191B9 /* EgressWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,7 +43,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				BC1DF2D22F66FDF900A191B9 /* VPNCheckerWidgetExtensionExtension.appex in Embed Foundation Extensions */,
+				BC1DF2D22F66FDF900A191B9 /* EgressWidgetExtensionExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -51,30 +51,30 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		BC1DF2802F65CC8900A191B9 /* VPNChecker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VPNChecker.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		BC1DF28D2F65CC8A00A191B9 /* VPNCheckerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VPNCheckerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		BC1DF2972F65CC8A00A191B9 /* VPNCheckerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VPNCheckerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		BC1DF2C22F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = VPNCheckerWidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC1DF2802F65CC8900A191B9 /* Egress.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Egress.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC1DF28D2F65CC8A00A191B9 /* EgressTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EgressTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC1DF2972F65CC8A00A191B9 /* EgressUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EgressUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC1DF2C22F66FDF800A191B9 /* EgressWidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = EgressWidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC1DF2C42F66FDF800A191B9 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = /System/Library/Frameworks/WidgetKit.framework; sourceTree = "<absolute>"; };
 		BC1DF2C62F66FDF800A191B9 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = /System/Library/Frameworks/SwiftUI.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		BC1DF2D32F66FDF900A191B9 /* Exceptions for "VPNCheckerWidgetExtension" folder in "VPNCheckerWidgetExtensionExtension" target */ = {
+		BC1DF2D32F66FDF900A191B9 /* Exceptions for "VPNCheckerWidgetExtension" folder in "EgressWidgetExtensionExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = BC1DF2C12F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension */;
+			target = BC1DF2C12F66FDF800A191B9 /* EgressWidgetExtensionExtension */;
 		};
-		BC1DF2D92F66FE2F00A191B9 /* Exceptions for "VPNChecker" folder in "VPNCheckerWidgetExtensionExtension" target */ = {
+		BC1DF2D92F66FE2F00A191B9 /* Exceptions for "VPNChecker" folder in "EgressWidgetExtensionExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				MullvadProvider.swift,
 				VPNProvider.swift,
 				VPNStatusChecker.swift,
 			);
-			target = BC1DF2C12F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension */;
+			target = BC1DF2C12F66FDF800A191B9 /* EgressWidgetExtensionExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -82,7 +82,7 @@
 		BC1DF2822F65CC8900A191B9 /* VPNChecker */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				BC1DF2D92F66FE2F00A191B9 /* Exceptions for "VPNChecker" folder in "VPNCheckerWidgetExtensionExtension" target */,
+				BC1DF2D92F66FE2F00A191B9 /* Exceptions for "VPNChecker" folder in "EgressWidgetExtensionExtension" target */,
 			);
 			path = VPNChecker;
 			sourceTree = "<group>";
@@ -100,7 +100,7 @@
 		BC1DF2C82F66FDF800A191B9 /* VPNCheckerWidgetExtension */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				BC1DF2D32F66FDF900A191B9 /* Exceptions for "VPNCheckerWidgetExtension" folder in "VPNCheckerWidgetExtensionExtension" target */,
+				BC1DF2D32F66FDF900A191B9 /* Exceptions for "VPNCheckerWidgetExtension" folder in "EgressWidgetExtensionExtension" target */,
 			);
 			path = VPNCheckerWidgetExtension;
 			sourceTree = "<group>";
@@ -156,10 +156,10 @@
 		BC1DF2812F65CC8900A191B9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BC1DF2802F65CC8900A191B9 /* VPNChecker.app */,
-				BC1DF28D2F65CC8A00A191B9 /* VPNCheckerTests.xctest */,
-				BC1DF2972F65CC8A00A191B9 /* VPNCheckerUITests.xctest */,
-				BC1DF2C22F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension.appex */,
+				BC1DF2802F65CC8900A191B9 /* Egress.app */,
+				BC1DF28D2F65CC8A00A191B9 /* EgressTests.xctest */,
+				BC1DF2972F65CC8A00A191B9 /* EgressUITests.xctest */,
+				BC1DF2C22F66FDF800A191B9 /* EgressWidgetExtensionExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -176,9 +176,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		BC1DF27F2F65CC8900A191B9 /* VPNChecker */ = {
+		BC1DF27F2F65CC8900A191B9 /* Egress */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BC1DF2A12F65CC8A00A191B9 /* Build configuration list for PBXNativeTarget "VPNChecker" */;
+			buildConfigurationList = BC1DF2A12F65CC8A00A191B9 /* Build configuration list for PBXNativeTarget "Egress" */;
 			buildPhases = (
 				BC1DF27C2F65CC8900A191B9 /* Sources */,
 				BC1DF27D2F65CC8900A191B9 /* Frameworks */,
@@ -193,16 +193,16 @@
 			fileSystemSynchronizedGroups = (
 				BC1DF2822F65CC8900A191B9 /* VPNChecker */,
 			);
-			name = VPNChecker;
+			name = Egress;
 			packageProductDependencies = (
 			);
 			productName = VPNChecker;
-			productReference = BC1DF2802F65CC8900A191B9 /* VPNChecker.app */;
+			productReference = BC1DF2802F65CC8900A191B9 /* Egress.app */;
 			productType = "com.apple.product-type.application";
 		};
-		BC1DF28C2F65CC8A00A191B9 /* VPNCheckerTests */ = {
+		BC1DF28C2F65CC8A00A191B9 /* EgressTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BC1DF2A42F65CC8A00A191B9 /* Build configuration list for PBXNativeTarget "VPNCheckerTests" */;
+			buildConfigurationList = BC1DF2A42F65CC8A00A191B9 /* Build configuration list for PBXNativeTarget "EgressTests" */;
 			buildPhases = (
 				BC1DF2892F65CC8A00A191B9 /* Sources */,
 				BC1DF28A2F65CC8A00A191B9 /* Frameworks */,
@@ -216,16 +216,16 @@
 			fileSystemSynchronizedGroups = (
 				BC1DF2902F65CC8A00A191B9 /* VPNCheckerTests */,
 			);
-			name = VPNCheckerTests;
+			name = EgressTests;
 			packageProductDependencies = (
 			);
 			productName = VPNCheckerTests;
-			productReference = BC1DF28D2F65CC8A00A191B9 /* VPNCheckerTests.xctest */;
+			productReference = BC1DF28D2F65CC8A00A191B9 /* EgressTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		BC1DF2962F65CC8A00A191B9 /* VPNCheckerUITests */ = {
+		BC1DF2962F65CC8A00A191B9 /* EgressUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BC1DF2A72F65CC8A00A191B9 /* Build configuration list for PBXNativeTarget "VPNCheckerUITests" */;
+			buildConfigurationList = BC1DF2A72F65CC8A00A191B9 /* Build configuration list for PBXNativeTarget "EgressUITests" */;
 			buildPhases = (
 				BC1DF2932F65CC8A00A191B9 /* Sources */,
 				BC1DF2942F65CC8A00A191B9 /* Frameworks */,
@@ -239,16 +239,16 @@
 			fileSystemSynchronizedGroups = (
 				BC1DF29A2F65CC8A00A191B9 /* VPNCheckerUITests */,
 			);
-			name = VPNCheckerUITests;
+			name = EgressUITests;
 			packageProductDependencies = (
 			);
 			productName = VPNCheckerUITests;
-			productReference = BC1DF2972F65CC8A00A191B9 /* VPNCheckerUITests.xctest */;
+			productReference = BC1DF2972F65CC8A00A191B9 /* EgressUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		BC1DF2C12F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension */ = {
+		BC1DF2C12F66FDF800A191B9 /* EgressWidgetExtensionExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BC1DF2D42F66FDF900A191B9 /* Build configuration list for PBXNativeTarget "VPNCheckerWidgetExtensionExtension" */;
+			buildConfigurationList = BC1DF2D42F66FDF900A191B9 /* Build configuration list for PBXNativeTarget "EgressWidgetExtensionExtension" */;
 			buildPhases = (
 				BC1DF2BE2F66FDF800A191B9 /* Sources */,
 				BC1DF2BF2F66FDF800A191B9 /* Frameworks */,
@@ -261,11 +261,11 @@
 			fileSystemSynchronizedGroups = (
 				BC1DF2C82F66FDF800A191B9 /* VPNCheckerWidgetExtension */,
 			);
-			name = VPNCheckerWidgetExtensionExtension;
+			name = EgressWidgetExtensionExtension;
 			packageProductDependencies = (
 			);
 			productName = VPNCheckerWidgetExtensionExtension;
-			productReference = BC1DF2C22F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension.appex */;
+			productReference = BC1DF2C22F66FDF800A191B9 /* EgressWidgetExtensionExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -294,7 +294,7 @@
 					};
 				};
 			};
-			buildConfigurationList = BC1DF27B2F65CC8900A191B9 /* Build configuration list for PBXProject "VPNChecker" */;
+			buildConfigurationList = BC1DF27B2F65CC8900A191B9 /* Build configuration list for PBXProject "Egress" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -308,10 +308,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				BC1DF27F2F65CC8900A191B9 /* VPNChecker */,
-				BC1DF28C2F65CC8A00A191B9 /* VPNCheckerTests */,
-				BC1DF2962F65CC8A00A191B9 /* VPNCheckerUITests */,
-				BC1DF2C12F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension */,
+				BC1DF27F2F65CC8900A191B9 /* Egress */,
+				BC1DF28C2F65CC8A00A191B9 /* EgressTests */,
+				BC1DF2962F65CC8A00A191B9 /* EgressUITests */,
+				BC1DF2C12F66FDF800A191B9 /* EgressWidgetExtensionExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -381,17 +381,17 @@
 /* Begin PBXTargetDependency section */
 		BC1DF28F2F65CC8A00A191B9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = BC1DF27F2F65CC8900A191B9 /* VPNChecker */;
+			target = BC1DF27F2F65CC8900A191B9 /* Egress */;
 			targetProxy = BC1DF28E2F65CC8A00A191B9 /* PBXContainerItemProxy */;
 		};
 		BC1DF2992F65CC8A00A191B9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = BC1DF27F2F65CC8900A191B9 /* VPNChecker */;
+			target = BC1DF27F2F65CC8900A191B9 /* Egress */;
 			targetProxy = BC1DF2982F65CC8A00A191B9 /* PBXContainerItemProxy */;
 		};
 		BC1DF2D12F66FDF900A191B9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = BC1DF2C12F66FDF800A191B9 /* VPNCheckerWidgetExtensionExtension */;
+			target = BC1DF2C12F66FDF800A191B9 /* EgressWidgetExtensionExtension */;
 			targetProxy = BC1DF2D02F66FDF900A191B9 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -552,7 +552,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dk.montnoir.VPNChecker;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.montnoir.Egress;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -607,7 +607,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dk.montnoir.VPNChecker;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.montnoir.Egress;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -644,7 +644,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VPNChecker.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/VPNChecker";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Egress.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Egress";
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
 			name = Debug;
@@ -670,7 +670,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VPNChecker.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/VPNChecker";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Egress.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Egress";
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
 			name = Release;
@@ -762,7 +762,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dk.montnoir.VPNChecker.VPNCheckerWidgetExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.montnoir.Egress.EgressWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
@@ -814,7 +814,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dk.montnoir.VPNChecker.VPNCheckerWidgetExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = dk.montnoir.Egress.EgressWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
@@ -832,7 +832,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		BC1DF27B2F65CC8900A191B9 /* Build configuration list for PBXProject "VPNChecker" */ = {
+		BC1DF27B2F65CC8900A191B9 /* Build configuration list for PBXProject "Egress" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BC1DF29F2F65CC8A00A191B9 /* Debug */,
@@ -841,7 +841,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BC1DF2A12F65CC8A00A191B9 /* Build configuration list for PBXNativeTarget "VPNChecker" */ = {
+		BC1DF2A12F65CC8A00A191B9 /* Build configuration list for PBXNativeTarget "Egress" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BC1DF2A22F65CC8A00A191B9 /* Debug */,
@@ -850,7 +850,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BC1DF2A42F65CC8A00A191B9 /* Build configuration list for PBXNativeTarget "VPNCheckerTests" */ = {
+		BC1DF2A42F65CC8A00A191B9 /* Build configuration list for PBXNativeTarget "EgressTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BC1DF2A52F65CC8A00A191B9 /* Debug */,
@@ -859,7 +859,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BC1DF2A72F65CC8A00A191B9 /* Build configuration list for PBXNativeTarget "VPNCheckerUITests" */ = {
+		BC1DF2A72F65CC8A00A191B9 /* Build configuration list for PBXNativeTarget "EgressUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BC1DF2A82F65CC8A00A191B9 /* Debug */,
@@ -868,7 +868,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BC1DF2D42F66FDF900A191B9 /* Build configuration list for PBXNativeTarget "VPNCheckerWidgetExtensionExtension" */ = {
+		BC1DF2D42F66FDF900A191B9 /* Build configuration list for PBXNativeTarget "EgressWidgetExtensionExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BC1DF2D52F66FDF900A191B9 /* Debug */,
