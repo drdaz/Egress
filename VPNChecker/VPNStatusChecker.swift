@@ -29,7 +29,6 @@ enum ConfigStore {
     private static var fileURL: URL? {
         let fm = FileManager.default
 
-        let process = ProcessInfo.processInfo.processName
         let baseDir: URL
         if let groupContainer = fm.containerURL(
             forSecurityApplicationGroupIdentifier: appGroupIdentifier

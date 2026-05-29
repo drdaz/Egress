@@ -208,25 +208,32 @@ struct MediumVPNWidgetView: View {
 
                 VStack(alignment: .leading, spacing: 6) {
                     if status.isConnected {
-                        Text("Connected to \(entry.selectedProviderName)")
+                        Text("Connected")
                             .font(.headline)
                             .fontWeight(.bold)
+                        
+                        Text(entry.selectedProviderName)
+                            .font(.subheadline)
+//                            .foregroundStyle(.secondary)
 
                         if let server = status.serverName {
-                            Text("Server: \(server)")
+                            Text(server)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
 
-                        Text(status.locationDescription)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+//                        Text(status.locationDescription)
+//                            .font(.caption)
+//                            .foregroundStyle(.secondary)
                     } else {
-                        Text("Not connected to \(entry.selectedProviderName)")
+                        Text("Not connected")
                             .font(.headline)
                             .fontWeight(.bold)
-                        Text("IP: \(status.ipAddress)")
-                            .font(.caption)
+                        Text(entry.selectedProviderName)
+                            .font(.subheadline)
+//                            .foregroundStyle(.secondary)
+                        Text(status.ipAddress)
+                            .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -297,5 +304,19 @@ struct MediumVPNWidgetView: View {
             serverName: "se-sto-wg-001"
         ),
         selectedProviderName: "Mullvad"
+    )
+    VPNStatusEntry(
+        date: .now,
+        status: VPNStatus(
+            isConnected: false,
+            ipAddress: "203.0.113.1",
+            serverLocation: nil,
+            country: "United States",
+            city: "New York",
+            organization: "ISP Corp",
+            providerName: "None",
+            serverName: nil
+        ),
+        selectedProviderName: "AirVPN"
     )
 }
