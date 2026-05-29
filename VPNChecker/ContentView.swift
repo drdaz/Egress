@@ -15,6 +15,20 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
+                HStack {
+                    Text("Provider")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Picker("Provider", selection: $checker.selectedProviderType) {
+                        ForEach(VPNProviderType.allCases) { type in
+                            Text(type.displayName).tag(type)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                    .disabled(checker.isLoading)
+                }
+
                 if checker.isLoading {
                     ProgressView("Checking VPN status...")
                 } else if let status = checker.currentStatus {
@@ -62,12 +76,20 @@ struct ContentView: View {
                 }
             }
             .padding()
-            .navigationTitle("VPN Checker")
+            .navigationTitle("Egress")
+            .navigationSubtitle("VPN Checker")
             .task {
                 await checker.checkStatus()
                 lastChecked = Date()
                 // Refresh widgets when app appears
                 WidgetCenter.shared.reloadAllTimelines()
+            }
+            .onChange(of: checker.selectedProviderType) { _, _ in
+                Task {
+                    await checker.checkStatus()
+                    lastChecked = Date()
+                    WidgetCenter.shared.reloadAllTimelines()
+                }
             }
         }
     }

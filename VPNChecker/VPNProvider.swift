@@ -68,6 +68,28 @@ protocol VPNProvider {
     func checkStatus() async throws -> VPNStatus
 }
 
+/// The set of VPN providers the user can choose between
+enum VPNProviderType: String, CaseIterable, Identifiable, Codable {
+    case mullvad
+    case airvpn
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .mullvad: return "Mullvad"
+        case .airvpn: return "AirVPN"
+        }
+    }
+
+    func makeProvider() -> VPNProvider {
+        switch self {
+        case .mullvad: return MullvadProvider()
+        case .airvpn: return AirVPNProvider()
+        }
+    }
+}
+
 /// Error types for VPN checking
 enum VPNProviderError: LocalizedError {
     case invalidURL

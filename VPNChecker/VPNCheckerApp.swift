@@ -21,15 +21,14 @@ struct VPNCheckerApp: App {
         }
         #else
         // macOS: Menu bar app with optional window
-        WindowGroup(id: "main") {
+        Window("Egress", id: "main") {
             ContentView()
-                .frame(width: 400, height: 500)
+                .frame(minWidth: 400, idealWidth: 400, maxWidth: 400,
+                       minHeight: 500, idealHeight: 500, maxHeight: 500)
         }
         .windowResizability(.contentSize)
         .defaultSize(width: 400, height: 500)
-        .commands {
-            CommandGroup(replacing: .newItem) { }
-        }
+        .defaultPosition(.center)
         
         Settings {
             SettingsView()
