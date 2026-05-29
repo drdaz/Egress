@@ -26,51 +26,41 @@ struct VPNCheckerWidget: Widget {
 
 struct VPNStatusProvider: TimelineProvider {
     func placeholder(in context: Context) -> VPNStatusEntry {
-        VPNStatusEntry(
+        return VPNStatusEntry(
             date: Date(),
-            status: VPNStatus(
-                isConnected: true,
-                ipAddress: "10.0.0.1",
-                serverLocation: "wireguard",
-                country: "Sweden",
-                city: "Stockholm",
-                organization: "Mullvad VPN",
-                providerName: "Mullvad",
-                serverName: "se-sto-wg-001"
-            )
+            status: nil,
+            selectedProviderName: ""
         )
     }
 
     func getSnapshot(in context: Context, completion: @escaping (VPNStatusEntry) -> ()) {
+        let selectedName = ConfigStore.load().selectedProviderType.displayName
         Task {
             do {
                 let status = try await VPNStatusChecker.checkStatus()
-                let entry = VPNStatusEntry(date: Date(), status: status)
+                let entry = VPNStatusEntry(date: Date(), status: status, selectedProviderName: selectedName)
                 completion(entry)
             } catch {
-                print("❌ Widget snapshot error: \(error)")
-                let entry = VPNStatusEntry(date: Date(), status: nil, error: formatError(error))
+                let entry = VPNStatusEntry(date: Date(), status: nil, selectedProviderName: selectedName, error: formatError(error))
                 completion(entry)
             }
         }
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<VPNStatusEntry>) -> ()) {
-        print("🔄 Widget getTimeline called at \(Date())")
+        let selectedName = ConfigStore.load().selectedProviderType.displayName
         Task {
             do {
                 let status = try await VPNStatusChecker.checkStatus()
-                let entry = VPNStatusEntry(date: Date(), status: status)
-                
+                let entry = VPNStatusEntry(date: Date(), status: status, selectedProviderName: selectedName)
+
                 // Refresh every 15 minutes
                 let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: Date())!
-                print("✅ Widget timeline updated, next refresh at \(nextUpdate)")
                 let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
                 completion(timeline)
             } catch {
-                print("❌ Widget timeline error: \(error)")
-                let entry = VPNStatusEntry(date: Date(), status: nil, error: formatError(error))
-                
+                let entry = VPNStatusEntry(date: Date(), status: nil, selectedProviderName: selectedName, error: formatError(error))
+
                 // Retry in 5 minutes on error
                 let nextUpdate = Calendar.current.date(byAdding: .minute, value: 5, to: Date())!
                 let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
@@ -103,6 +93,7 @@ struct VPNStatusProvider: TimelineProvider {
 struct VPNStatusEntry: TimelineEntry {
     let date: Date
     let status: VPNStatus?
+    let selectedProviderName: String
     var error: String?
 }
 
@@ -138,8 +129,11 @@ struct SmallVPNWidgetView: View {
                 Image(systemName: "exclamationmark.triangle")
                     .font(.largeTitle)
                     .foregroundStyle(.orange)
-                Text("Error")
+                Text(entry.selectedProviderName)
                     .font(.caption)
+                    .fontWeight(.semibold)
+                Text("Error")
+                    .font(.caption2)
                     .foregroundStyle(.secondary)
             }
         } else if let status = entry.status {
@@ -147,16 +141,16 @@ struct SmallVPNWidgetView: View {
                 Image(systemName: status.isConnected ? "checkmark.shield.fill" : "xmark.shield.fill")
                     .font(.largeTitle)
                     .foregroundStyle(status.isConnected ? .green : .red)
-                
-                Text(status.isConnected ? "Connected" : "Disconnected")
+
+                Text(entry.selectedProviderName)
                     .font(.caption)
                     .fontWeight(.semibold)
-                
+
+                Text(status.isConnected ? "Connected" : "Not connected")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+
                 if status.isConnected {
-                    Text(status.providerName)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                    
                     if let server = status.serverName {
                         Text(server)
                             .font(.caption2)
@@ -165,8 +159,12 @@ struct SmallVPNWidgetView: View {
                     } else if let country = status.country {
                         Text(country)
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.tertiary)
                     }
+                } else {
+                    Text(status.ipAddress)
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
                 }
             }
             .padding()
@@ -192,7 +190,7 @@ struct MediumVPNWidgetView: View {
                     .font(.largeTitle)
                     .foregroundStyle(.orange)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Error Checking Status")
+                    Text("Error checking \(entry.selectedProviderName)")
                         .font(.headline)
                     Text(error)
                         .font(.caption)
@@ -207,24 +205,24 @@ struct MediumVPNWidgetView: View {
                 Image(systemName: status.isConnected ? "checkmark.shield.fill" : "xmark.shield.fill")
                     .font(.system(size: 44))
                     .foregroundStyle(status.isConnected ? .green : .red)
-                
+
                 VStack(alignment: .leading, spacing: 6) {
                     if status.isConnected {
-                        Text("Connected to \(status.providerName)")
+                        Text("Connected to \(entry.selectedProviderName)")
                             .font(.headline)
                             .fontWeight(.bold)
-                        
+
                         if let server = status.serverName {
                             Text("Server: \(server)")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
-                        
+
                         Text(status.locationDescription)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     } else {
-                        Text("VPN Disconnected")
+                        Text("Not connected to \(entry.selectedProviderName)")
                             .font(.headline)
                             .fontWeight(.bold)
                         Text("IP: \(status.ipAddress)")
@@ -232,14 +230,14 @@ struct MediumVPNWidgetView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-                
+
                 Spacer()
             }
             .padding()
         } else {
             HStack(spacing: 16) {
                 ProgressView()
-                Text("Checking VPN status...")
+                Text("Checking \(entry.selectedProviderName) status...")
                     .font(.subheadline)
                 Spacer()
             }
@@ -264,7 +262,8 @@ struct MediumVPNWidgetView: View {
             organization: "Mullvad VPN",
             providerName: "Mullvad",
             serverName: "se-sto-wg-001"
-        )
+        ),
+        selectedProviderName: "Mullvad"
     )
     VPNStatusEntry(
         date: .now,
@@ -277,7 +276,8 @@ struct MediumVPNWidgetView: View {
             organization: "ISP Corp",
             providerName: "None",
             serverName: nil
-        )
+        ),
+        selectedProviderName: "AirVPN"
     )
 }
 
@@ -295,6 +295,7 @@ struct MediumVPNWidgetView: View {
             organization: "Mullvad VPN",
             providerName: "Mullvad",
             serverName: "se-sto-wg-001"
-        )
+        ),
+        selectedProviderName: "Mullvad"
     )
 }

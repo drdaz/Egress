@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import os
 internal import Combine
 
 /// Persisted app configuration written as JSON in Application Support.
@@ -28,6 +29,7 @@ enum ConfigStore {
     private static var fileURL: URL? {
         let fm = FileManager.default
 
+        let process = ProcessInfo.processInfo.processName
         let baseDir: URL
         if let groupContainer = fm.containerURL(
             forSecurityApplicationGroupIdentifier: appGroupIdentifier
@@ -88,10 +90,14 @@ class VPNStatusChecker: ObservableObject {
     }
 
     func checkStatus() async {
-        await MainActor.run { isLoading = true }
-        await MainActor.run { errorMessage = nil }
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+        }
 
-        let provider = selectedProviderType.makeProvider()
+        // Always read the persisted selection so instances that don't own the picker
+        // (e.g. the menu bar's AppDelegate.checker) honor changes made in the UI.
+        let provider = ConfigStore.load().selectedProviderType.makeProvider()
 
         do {
             let status = try await provider.checkStatus()

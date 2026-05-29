@@ -30,15 +30,18 @@ struct ContentView: View {
                 }
 
                 if checker.isLoading {
-                    ProgressView("Checking VPN status...")
+                    ProgressView("Checking \(checker.selectedProviderType.displayName) status...")
                 } else if let status = checker.currentStatus {
-                    VPNStatusView(status: status)
+                    VPNStatusView(
+                        status: status,
+                        selectedProviderName: checker.selectedProviderType.displayName
+                    )
                 } else if let error = checker.errorMessage {
                     VStack(spacing: 12) {
                         Image(systemName: "exclamationmark.triangle")
                             .font(.system(size: 50))
                             .foregroundStyle(.orange)
-                        Text("Error")
+                        Text("Error checking \(checker.selectedProviderType.displayName)")
                             .font(.headline)
                         Text(error)
                             .font(.subheadline)
@@ -50,7 +53,7 @@ struct ContentView: View {
                         Image(systemName: "network")
                             .font(.system(size: 50))
                             .foregroundStyle(.gray)
-                        Text("Check your VPN status")
+                        Text("Check your \(checker.selectedProviderType.displayName) status")
                             .font(.headline)
                     }
                 }
@@ -97,16 +100,18 @@ struct ContentView: View {
 
 struct VPNStatusView: View {
     let status: VPNStatus
-    
+    let selectedProviderName: String
+
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: status.isConnected ? "checkmark.shield.fill" : "xmark.shield.fill")
                 .font(.system(size: 60))
                 .foregroundStyle(status.isConnected ? .green : .red)
-            
-            Text(status.isConnected ? "Connected" : "Not Connected")
+
+            Text(status.isConnected ? "Connected to \(selectedProviderName)" : "Not connected to \(selectedProviderName)")
                 .font(.title)
                 .fontWeight(.bold)
+                .multilineTextAlignment(.center)
             
             VStack(alignment: .leading, spacing: 12) {
                 InfoRow(label: "IP Address", value: status.ipAddress)
