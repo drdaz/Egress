@@ -15,26 +15,14 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                HStack {
-                    Text("Provider")
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Picker("Provider", selection: $checker.selectedProviderType) {
-                        ForEach(VPNProviderType.allCases) { type in
-                            Text(type.displayName).tag(type)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
-                    .disabled(checker.isLoading)
-                }
-
                 if checker.isLoading {
                     ProgressView("Checking \(checker.selectedProviderType.displayName) status...")
                 } else if let status = checker.currentStatus {
                     VPNStatusView(
                         status: status,
-                        selectedProviderName: checker.selectedProviderType.displayName
+                        selectedProviderName: checker.selectedProviderType.displayName,
+                        selectedProviderType: $checker.selectedProviderType,
+                        isLoading: checker.isLoading
                     )
                 } else if let error = checker.errorMessage {
                     VStack(spacing: 12) {
@@ -68,6 +56,7 @@ struct ContentView: View {
                 } label: {
                     Label("Check Status", systemImage: "arrow.clockwise")
                         .frame(maxWidth: .infinity)
+                        .frame(height: 30)
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(checker.isLoading)
@@ -101,6 +90,8 @@ struct ContentView: View {
 struct VPNStatusView: View {
     let status: VPNStatus
     let selectedProviderName: String
+    @Binding var selectedProviderType: VPNProviderType
+    let isLoading: Bool
 
     var body: some View {
         VStack(spacing: 20) {
@@ -108,11 +99,27 @@ struct VPNStatusView: View {
                 .font(.system(size: 60))
                 .foregroundStyle(status.isConnected ? .green : .red)
 
-            Text(status.isConnected ? "Connected to \(selectedProviderName)" : "Not connected to \(selectedProviderName)")
+            Text(status.isConnected ? "Connected" : "Not connected")
                 .font(.title)
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
-            
+
+            HStack {
+                Text("Provider")
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Picker("Provider", selection: $selectedProviderType) {
+                    ForEach(VPNProviderType.allCases) { type in
+                        Text(type.displayName).tag(type)
+                    }
+                }
+                .pickerStyle(.menu)
+                .labelsHidden()
+                .disabled(isLoading)
+            }
+            .padding(.horizontal)
+            .padding(.bottom, -12)
+
             VStack(alignment: .leading, spacing: 12) {
                 InfoRow(label: "IP Address", value: status.ipAddress)
                 
