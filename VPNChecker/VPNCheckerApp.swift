@@ -41,6 +41,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
     private var checker = VPNStatusChecker()
     
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return false
+    }
+    
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Create menu bar status item
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
