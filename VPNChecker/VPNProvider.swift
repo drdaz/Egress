@@ -72,6 +72,7 @@ protocol VPNProvider {
 enum VPNProviderType: String, CaseIterable, Identifiable, Codable {
     case mullvad
     case airvpn
+    case ivpn
 
     var id: String { rawValue }
 
@@ -79,6 +80,7 @@ enum VPNProviderType: String, CaseIterable, Identifiable, Codable {
         switch self {
         case .mullvad: return "Mullvad"
         case .airvpn: return "AirVPN"
+        case .ivpn: return "IVPN"
         }
     }
 
@@ -86,6 +88,7 @@ enum VPNProviderType: String, CaseIterable, Identifiable, Codable {
         switch self {
         case .mullvad: return MullvadProvider()
         case .airvpn: return AirVPNProvider()
+        case .ivpn: return IVPNProvider()
         }
     }
 }
