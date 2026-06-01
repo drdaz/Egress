@@ -72,10 +72,10 @@
 		BC1DF2D92F66FE2F00A191B9 /* Exceptions for "VPNChecker" folder in "EgressWidgetExtensionExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				AirVPNProvider.swift,
-				IVPNProvider.swift,
-				MullvadProvider.swift,
-				VPNProvider.swift,
+				Providers/AirVPNProvider.swift,
+				Providers/IVPNProvider.swift,
+				Providers/MullvadProvider.swift,
+				Providers/VPNProvider.swift,
 				VPNStatusChecker.swift,
 			);
 			target = BC1DF2C12F66FDF800A191B9 /* EgressWidgetExtensionExtension */;

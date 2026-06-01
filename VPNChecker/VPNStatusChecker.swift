@@ -9,6 +9,10 @@ import Foundation
 import os
 internal import Combine
 
+extension Notification.Name {
+    static let vpnProviderChanged = Notification.Name("dk.montnoir.Egress.vpnProviderChanged")
+}
+
 /// Persisted app configuration written as JSON in Application Support.
 struct AppConfig: Codable {
     var selectedProviderType: VPNProviderType
@@ -81,6 +85,7 @@ class VPNStatusChecker: ObservableObject {
             ConfigStore.save(config)
             currentStatus = nil
             errorMessage = nil
+            NotificationCenter.default.post(name: .vpnProviderChanged, object: nil)
         }
     }
 
