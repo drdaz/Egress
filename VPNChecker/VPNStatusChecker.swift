@@ -7,11 +7,7 @@
 
 import Foundation
 import os
-internal import Combine
-
-extension Notification.Name {
-    static let vpnProviderChanged = Notification.Name("dk.montnoir.Egress.vpnProviderChanged")
-}
+import Combine
 
 /// Persisted app configuration written as JSON in Application Support.
 struct AppConfig: Codable {
@@ -77,21 +73,6 @@ class VPNStatusChecker: ObservableObject {
     @Published var currentStatus: VPNStatus?
     @Published var isLoading = false
     @Published var errorMessage: String?
-    @Published var selectedProviderType: VPNProviderType {
-        didSet {
-            guard oldValue != selectedProviderType else { return }
-            var config = ConfigStore.load()
-            config.selectedProviderType = selectedProviderType
-            ConfigStore.save(config)
-            currentStatus = nil
-            errorMessage = nil
-            NotificationCenter.default.post(name: .vpnProviderChanged, object: nil)
-        }
-    }
-
-    init() {
-        self.selectedProviderType = ConfigStore.load().selectedProviderType
-    }
 
     func checkStatus() async {
         await MainActor.run {
@@ -99,8 +80,6 @@ class VPNStatusChecker: ObservableObject {
             errorMessage = nil
         }
 
-        // Always read the persisted selection so instances that don't own the picker
-        // (e.g. the menu bar's AppDelegate.checker) honor changes made in the UI.
         let provider = ConfigStore.load().selectedProviderType.makeProvider()
 
         do {

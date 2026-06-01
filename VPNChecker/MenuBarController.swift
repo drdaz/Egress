@@ -1,5 +1,6 @@
 #if os(macOS)
 import AppKit
+import Combine
 import SwiftUI
 import WidgetKit
 
@@ -7,6 +8,7 @@ class MenuBarController: NSObject {
     private var statusItem: NSStatusItem?
     private var checker = VPNStatusChecker()
     private var timer: Timer?
+    private var cancellable: AnyCancellable?
 
     func start() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -25,16 +27,11 @@ class MenuBarController: NSObject {
             Task { await self?.updateMenuBarIcon() }
         }
 
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(providerChanged),
-            name: .vpnProviderChanged,
-            object: nil
-        )
-    }
-
-    @objc private func providerChanged() {
-        Task { await updateMenuBarIcon() }
+        cancellable = ProviderSelection.shared.$providerType
+            .dropFirst()
+            .sink { [weak self] _ in
+                Task { await self?.updateMenuBarIcon() }
+            }
     }
 
     @objc private func statusBarButtonClicked() {

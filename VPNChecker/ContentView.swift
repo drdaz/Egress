@@ -10,18 +10,19 @@ import WidgetKit
 
 struct ContentView: View {
     @StateObject private var checker = VPNStatusChecker()
+    @ObservedObject private var providerSelection = ProviderSelection.shared
     @State private var lastChecked: Date?
-    
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
                 if checker.isLoading {
-                    ProgressView("Checking \(checker.selectedProviderType.displayName) status...")
+                    ProgressView("Checking \(providerSelection.providerType.displayName) status...")
                 } else if let status = checker.currentStatus {
                     VPNStatusView(
                         status: status,
-                        selectedProviderName: checker.selectedProviderType.displayName,
-                        selectedProviderType: $checker.selectedProviderType,
+                        selectedProviderName: providerSelection.providerType.displayName,
+                        selectedProviderType: $providerSelection.providerType,
                         isLoading: checker.isLoading
                     )
                 } else if let error = checker.errorMessage {
@@ -29,7 +30,7 @@ struct ContentView: View {
                         Image(systemName: "exclamationmark.triangle")
                             .font(.system(size: 50))
                             .foregroundStyle(.orange)
-                        Text("Error checking \(checker.selectedProviderType.displayName)")
+                        Text("Error checking \(providerSelection.providerType.displayName)")
                             .font(.headline)
                         Text(error)
                             .font(.subheadline)
@@ -41,16 +42,15 @@ struct ContentView: View {
                         Image(systemName: "network")
                             .font(.system(size: 50))
                             .foregroundStyle(.gray)
-                        Text("Check your \(checker.selectedProviderType.displayName) status")
+                        Text("Check your \(providerSelection.providerType.displayName) status")
                             .font(.headline)
                     }
                 }
-                
+
                 Button {
                     Task {
                         await checker.checkStatus()
                         lastChecked = Date()
-                        // Refresh widgets after checking status
                         WidgetCenter.shared.reloadAllTimelines()
                     }
                 } label: {
@@ -60,7 +60,7 @@ struct ContentView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(checker.isLoading)
-                
+
                 if let lastChecked {
                     Text("Last checked: \(lastChecked, format: .relative(presentation: .named, unitsStyle: .abbreviated))")
                         .font(.caption)
@@ -73,10 +73,9 @@ struct ContentView: View {
             .task {
                 await checker.checkStatus()
                 lastChecked = Date()
-                // Refresh widgets when app appears
                 WidgetCenter.shared.reloadAllTimelines()
             }
-            .onChange(of: checker.selectedProviderType) { _, _ in
+            .onChange(of: providerSelection.providerType) { _, _ in
                 Task {
                     await checker.checkStatus()
                     lastChecked = Date()
@@ -122,13 +121,13 @@ struct VPNStatusView: View {
 
             VStack(alignment: .leading, spacing: 12) {
                 InfoRow(label: "IP Address", value: status.ipAddress)
-                
+
                 if let server = status.serverName {
                     InfoRow(label: "Server", value: server)
                 }
-                
+
                 InfoRow(label: "Location", value: status.locationDescription)
-                
+
                 if let organization = status.organization {
                     InfoRow(label: "Organization", value: organization)
                 }
@@ -142,7 +141,7 @@ struct VPNStatusView: View {
 struct InfoRow: View {
     let label: String
     let value: String
-    
+
     var body: some View {
         HStack {
             Text(label)
