@@ -8,7 +8,7 @@
 import Foundation
 
 /// Mullvad VPN provider implementation
-struct MullvadProvider: VPNProvider {
+nonisolated struct MullvadProvider: VPNProvider {
     let providerName = "Mullvad"
     
     private let apiURL = URL(string: "https://am.i.mullvad.net/json")!
@@ -41,7 +41,7 @@ struct MullvadProvider: VPNProvider {
 
 // MARK: - Mullvad API Response Model
 
-private struct MullvadResponse: Codable {
+private nonisolated struct MullvadResponse: Codable {
     let ip: String
     let country: String
     let city: String

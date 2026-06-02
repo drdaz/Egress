@@ -10,10 +10,17 @@ import os
 import Combine
 
 /// Persisted app configuration written as JSON in Application Support.
-struct AppConfig: Codable {
+nonisolated struct AppConfig: Codable {
     var selectedProviderType: VPNProviderType
+    /// Allowlist of IPv4 hosts/CIDR ranges used by the `.ipCheck` provider.
+    var ipCheckRules: [String]
 
     static let `default` = AppConfig(selectedProviderType: .mullvad)
+
+    init(selectedProviderType: VPNProviderType, ipCheckRules: [String] = []) {
+        self.selectedProviderType = selectedProviderType
+        self.ipCheckRules = ipCheckRules
+    }
 }
 
 /// Loads and saves `AppConfig` to a JSON file in the shared App Group container
@@ -80,9 +87,10 @@ class VPNStatusChecker: ObservableObject {
             errorMessage = nil
         }
 
-        let provider = ConfigStore.load().selectedProviderType.makeProvider()
+        let config = ConfigStore.load()
 
         do {
+            let provider = try config.selectedProviderType.makeProvider(ipCheckRules: config.ipCheckRules)
             let status = try await provider.checkStatus()
             await MainActor.run { currentStatus = status }
         } catch {
@@ -94,7 +102,8 @@ class VPNStatusChecker: ObservableObject {
 
     /// Static method for use in widgets (which can't use @MainActor easily)
     static func checkStatus(using provider: VPNProvider? = nil) async throws -> VPNStatus {
-        let actualProvider = provider ?? ConfigStore.load().selectedProviderType.makeProvider()
+        let config = ConfigStore.load()
+        let actualProvider = try provider ?? config.selectedProviderType.makeProvider(ipCheckRules: config.ipCheckRules)
         return try await actualProvider.checkStatus()
     }
 }

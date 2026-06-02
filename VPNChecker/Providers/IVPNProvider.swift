@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct IVPNProvider: VPNProvider {
+nonisolated struct IVPNProvider: VPNProvider {
     let providerName = "IVPN"
 
     private let apiURL = URL(string: "https://api.ivpn.net/v4/geo-lookup")!
@@ -46,7 +46,7 @@ struct IVPNProvider: VPNProvider {
 
 // MARK: - IVPN API Response Model
 
-private struct IVPNResponse: Codable {
+private nonisolated struct IVPNResponse: Codable {
     let ipAddress: String
     let isp: String?
     let organization: String?

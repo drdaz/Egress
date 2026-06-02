@@ -74,8 +74,11 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Providers/AirVPNProvider.swift,
+				Providers/IPCheckProvider.swift,
+				Providers/IPMatching.swift,
 				Providers/IVPNProvider.swift,
 				Providers/MullvadProvider.swift,
+				Providers/NetworkIPResolver.swift,
 				Providers/VPNProvider.swift,
 				VPNStatusChecker.swift,
 			);

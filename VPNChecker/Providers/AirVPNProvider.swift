@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AirVPNProvider: VPNProvider {
+nonisolated struct AirVPNProvider: VPNProvider {
     let providerName = "AirVPN"
 
     private let apiURL = URL(string: "https://airvpn.org/api/whatismyip/")!
@@ -43,7 +43,7 @@ struct AirVPNProvider: VPNProvider {
 
 // MARK: - AirVPN API Response Model
 
-private struct AirVPNResponse: Codable {
+private nonisolated struct AirVPNResponse: Codable {
     let ip: String
     let airvpn: Bool
     let result: String
@@ -56,12 +56,12 @@ private struct AirVPNResponse: Codable {
     }
 }
 
-private struct GeoResponse: Codable {
+private nonisolated struct GeoResponse: Codable {
     let code: String
     let name: String
 }
 
-private struct GeoAdditionalResponse: Codable {
+private nonisolated struct GeoAdditionalResponse: Codable {
     let ispName: String?
     let cityName: String?
 

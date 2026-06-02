@@ -8,7 +8,7 @@
 import Foundation
 
 /// Represents the connection status from a VPN provider
-struct VPNStatus: Codable, Equatable {
+nonisolated struct VPNStatus: Codable, Equatable {
     let isConnected: Bool
     let ipAddress: String
     let serverLocation: String?
@@ -58,7 +58,7 @@ struct VPNStatus: Codable, Equatable {
 }
 
 /// Protocol that all VPN providers must conform to
-protocol VPNProvider {
+nonisolated protocol VPNProvider {
     /// The name of the VPN provider (e.g., "Mullvad", "ProtonVPN")
     var providerName: String { get }
     
@@ -69,10 +69,11 @@ protocol VPNProvider {
 }
 
 /// The set of VPN providers the user can choose between
-enum VPNProviderType: String, CaseIterable, Identifiable, Codable {
+nonisolated enum VPNProviderType: String, CaseIterable, Identifiable, Codable {
     case mullvad
     case airvpn
     case ivpn
+    case ipCheck
 
     var id: String { rawValue }
 
@@ -81,20 +82,25 @@ enum VPNProviderType: String, CaseIterable, Identifiable, Codable {
         case .mullvad: return "Mullvad"
         case .airvpn: return "AirVPN"
         case .ivpn: return "IVPN"
+        case .ipCheck: return "IP Check"
         }
     }
 
-    func makeProvider() -> VPNProvider {
+    /// Builds the concrete provider.
+    /// - Parameter ipCheckRules: allowlist used only by the `.ipCheck` provider.
+    /// - Throws: if `ipCheckRules` contains a malformed IP/CIDR entry.
+    func makeProvider(ipCheckRules: [String] = []) throws -> VPNProvider {
         switch self {
         case .mullvad: return MullvadProvider()
         case .airvpn: return AirVPNProvider()
         case .ivpn: return IVPNProvider()
+        case .ipCheck: return try IPCheckProvider(rules: ipCheckRules, resolver: NetworkIPResolver())
         }
     }
 }
 
 /// Error types for VPN checking
-enum VPNProviderError: LocalizedError {
+nonisolated enum VPNProviderError: LocalizedError {
     case invalidURL
     case invalidResponse
     case networkError(Error)
