@@ -203,6 +203,29 @@ struct SelectedProviderNameTests {
     }
 }
 
+// MARK: - Settings picker items
+
+struct ProviderPickerItemsTests {
+
+    @Test func listsBuiltinsWhenNoCustomProviders() {
+        let items = AppConfig.default.pickerItems
+        #expect(items.map(\.selection) == [.builtin(.mullvad), .builtin(.airvpn), .builtin(.ivpn)])
+        #expect(items.map(\.label) == ["Mullvad", "AirVPN", "IVPN"])
+    }
+
+    @Test func appendsCustomProvidersAfterBuiltins() {
+        let home = CustomProvider(name: "Home", ranges: ["1.2.3.4"])
+        let office = CustomProvider(name: "Office", ranges: ["5.6.7.8"])
+        let config = AppConfig(customProviders: [home, office], selection: .builtin(.mullvad))
+
+        let items = config.pickerItems
+
+        #expect(items.count == 5)
+        #expect(items.suffix(2).map(\.selection) == [.custom(home.id), .custom(office.id)])
+        #expect(items.suffix(2).map(\.label) == ["Home", "Office"])
+    }
+}
+
 // MARK: - Built-in provider types
 
 struct VPNProviderTypeTests {

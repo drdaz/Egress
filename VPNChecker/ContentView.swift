@@ -12,6 +12,7 @@ struct ContentView: View {
     @StateObject private var checker = VPNStatusChecker()
     @ObservedObject private var providerSelection = ProviderSelection.shared
     @State private var lastChecked: Date?
+    @State private var showingSettings = false
 
     var body: some View {
         NavigationStack {
@@ -21,9 +22,7 @@ struct ContentView: View {
                 } else if let status = checker.currentStatus {
                     VPNStatusView(
                         status: status,
-                        selectedProviderName: providerSelection.selectedProviderName,
-                        selection: $providerSelection.selection,
-                        isLoading: checker.isLoading
+                        selectedProviderName: providerSelection.selectedProviderName
                     )
                 } else if let error = checker.errorMessage {
                     VStack(spacing: 12) {
@@ -82,6 +81,35 @@ struct ContentView: View {
                     WidgetCenter.shared.reloadAllTimelines()
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    #if os(macOS)
+                    SettingsLink {
+                        Image(systemName: "gearshape")
+                    }
+                    #else
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                    #endif
+                }
+            }
+            #if os(iOS)
+            .sheet(isPresented: $showingSettings) {
+                NavigationStack {
+                    SettingsView()
+                        .navigationTitle("Settings")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button("Done") { showingSettings = false }
+                            }
+                        }
+                }
+            }
+            #endif
         }
     }
 }
@@ -89,8 +117,6 @@ struct ContentView: View {
 struct VPNStatusView: View {
     let status: VPNStatus
     let selectedProviderName: String
-    @Binding var selection: SelectedProvider
-    let isLoading: Bool
 
     var body: some View {
         VStack(spacing: 20) {
@@ -103,23 +129,9 @@ struct VPNStatusView: View {
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
 
-            HStack {
-                Text("Provider")
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Picker("Provider", selection: $selection) {
-                    ForEach(VPNProviderType.allCases) { type in
-                        Text(type.displayName).tag(SelectedProvider.builtin(type))
-                    }
-                }
-                .pickerStyle(.menu)
-                .labelsHidden()
-                .disabled(isLoading)
-            }
-            .padding(.horizontal)
-            .padding(.bottom, -12)
-
             VStack(alignment: .leading, spacing: 12) {
+                InfoRow(label: "Provider", value: selectedProviderName)
+
                 InfoRow(label: "IP Address", value: status.ipAddress)
 
                 if let server = status.serverName {
