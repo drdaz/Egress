@@ -27,7 +27,7 @@ class MenuBarController: NSObject {
             Task { await self?.updateMenuBarIcon() }
         }
 
-        cancellable = ProviderSelection.shared.$providerType
+        cancellable = ProviderSelection.shared.$selection
             .dropFirst()
             .sink { [weak self] _ in
                 Task { await self?.updateMenuBarIcon() }

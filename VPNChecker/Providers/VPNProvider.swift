@@ -68,12 +68,12 @@ nonisolated protocol VPNProvider {
     func checkStatus() async throws -> VPNStatus
 }
 
-/// The set of VPN providers the user can choose between
+/// The set of built-in VPN providers the user can choose between.
+/// User-defined IP-based providers are represented separately by `CustomProvider`.
 nonisolated enum VPNProviderType: String, CaseIterable, Identifiable, Codable {
     case mullvad
     case airvpn
     case ivpn
-    case ipCheck
 
     var id: String { rawValue }
 
@@ -82,21 +82,52 @@ nonisolated enum VPNProviderType: String, CaseIterable, Identifiable, Codable {
         case .mullvad: return "Mullvad"
         case .airvpn: return "AirVPN"
         case .ivpn: return "IVPN"
-        case .ipCheck: return "IP Check"
         }
     }
 
-    /// Builds the concrete provider.
-    /// - Parameter ipCheckRules: allowlist used only by the `.ipCheck` provider.
-    /// - Throws: if `ipCheckRules` contains a malformed IP/CIDR entry.
-    func makeProvider(ipCheckRules: [String] = []) throws -> VPNProvider {
+    /// Builds the concrete built-in provider.
+    func makeProvider() -> VPNProvider {
         switch self {
         case .mullvad: return MullvadProvider()
         case .airvpn: return AirVPNProvider()
         case .ivpn: return IVPNProvider()
-        case .ipCheck: return try IPCheckProvider(rules: ipCheckRules, resolver: NetworkIPResolver())
         }
     }
+}
+
+/// A user-defined provider that reports "connected" when the current egress IP
+/// falls within its allowlist of IPv4 hosts/CIDR ranges. Each one is named and
+/// is selectable in the picker alongside the built-in providers.
+nonisolated struct CustomProvider: Codable, Equatable, Identifiable {
+    /// Stable identity, used by `SelectedProvider.custom` to reference this provider.
+    let id: UUID
+    var name: String
+    var ranges: [String]
+
+    init(id: UUID = UUID(), name: String, ranges: [String] = []) {
+        self.id = id
+        self.name = name
+        self.ranges = ranges
+    }
+}
+
+extension CustomProvider {
+    /// Builds the runtime provider that checks the current egress IP against this
+    /// provider's ranges. Mirrors `VPNProviderType.makeProvider()`.
+    /// - Parameter resolver: egress resolver (injected so tests can avoid the network).
+    /// - Throws: if `ranges` contains a malformed IP/CIDR entry.
+    func makeProvider(resolver: CurrentIPResolver = NetworkIPResolver()) throws -> VPNProvider {
+        try IPCheckProvider(name: name, rules: ranges, resolver: resolver)
+    }
+}
+
+/// The user's current provider choice: either a built-in provider or one of
+/// their custom IP-based providers (referenced by id).
+nonisolated enum SelectedProvider: Codable, Hashable {
+    case builtin(VPNProviderType)
+    case custom(UUID)
+
+    static let `default`: SelectedProvider = .builtin(.mullvad)
 }
 
 /// Error types for VPN checking

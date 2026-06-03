@@ -34,7 +34,7 @@ struct VPNStatusProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (VPNStatusEntry) -> ()) {
-        let selectedName = ConfigStore.load().selectedProviderType.displayName
+        let selectedName = ConfigStore.load().selectedProviderName
         Task {
             do {
                 let status = try await VPNStatusChecker.checkStatus()
@@ -48,7 +48,7 @@ struct VPNStatusProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<VPNStatusEntry>) -> ()) {
-        let selectedName = ConfigStore.load().selectedProviderType.displayName
+        let selectedName = ConfigStore.load().selectedProviderName
         Task {
             do {
                 let status = try await VPNStatusChecker.checkStatus()

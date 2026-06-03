@@ -27,12 +27,15 @@ nonisolated protocol CurrentIPResolver {
 
 /// Reports "connected" when the current egress IP matches the configured allowlist.
 nonisolated struct IPCheckProvider: VPNProvider {
-    let providerName = "IP Check"
+    let providerName: String
 
     private let matcher: IPMatcher
     private let resolver: CurrentIPResolver
 
-    init(rules: [String], resolver: CurrentIPResolver) throws {
+    /// - Parameter name: shown as the provider name in `VPNStatus` (e.g. a
+    ///   custom provider's name). Defaults to a generic label.
+    init(name: String = "IP Check", rules: [String], resolver: CurrentIPResolver) throws {
+        self.providerName = name
         self.matcher = try IPMatcher(rules: rules)
         self.resolver = resolver
     }

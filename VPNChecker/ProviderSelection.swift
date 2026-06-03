@@ -4,16 +4,27 @@ import Combine
 class ProviderSelection: ObservableObject {
     static let shared = ProviderSelection()
 
-    @Published var providerType: VPNProviderType {
+    @Published var selection: SelectedProvider {
         didSet {
-            guard oldValue != providerType else { return }
+            guard oldValue != selection else { return }
             var config = ConfigStore.load()
-            config.selectedProviderType = providerType
+            config.selection = selection
             ConfigStore.save(config)
         }
     }
 
     private init() {
-        providerType = ConfigStore.load().selectedProviderType
+        selection = ConfigStore.load().selection
+    }
+
+    /// Display name for the current selection, resolving custom provider names
+    /// from the persisted config.
+    var selectedProviderName: String {
+        switch selection {
+        case .builtin(let type):
+            return type.displayName
+        case .custom:
+            return ConfigStore.load().selectedProviderName
+        }
     }
 }

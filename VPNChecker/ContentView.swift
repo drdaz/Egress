@@ -17,12 +17,12 @@ struct ContentView: View {
         NavigationStack {
             VStack(spacing: 20) {
                 if checker.isLoading {
-                    ProgressView("Checking \(providerSelection.providerType.displayName) status...")
+                    ProgressView("Checking \(providerSelection.selectedProviderName) status...")
                 } else if let status = checker.currentStatus {
                     VPNStatusView(
                         status: status,
-                        selectedProviderName: providerSelection.providerType.displayName,
-                        selectedProviderType: $providerSelection.providerType,
+                        selectedProviderName: providerSelection.selectedProviderName,
+                        selection: $providerSelection.selection,
                         isLoading: checker.isLoading
                     )
                 } else if let error = checker.errorMessage {
@@ -30,7 +30,7 @@ struct ContentView: View {
                         Image(systemName: "exclamationmark.triangle")
                             .font(.system(size: 50))
                             .foregroundStyle(.orange)
-                        Text("Error checking \(providerSelection.providerType.displayName)")
+                        Text("Error checking \(providerSelection.selectedProviderName)")
                             .font(.headline)
                         Text(error)
                             .font(.subheadline)
@@ -42,7 +42,7 @@ struct ContentView: View {
                         Image(systemName: "network")
                             .font(.system(size: 50))
                             .foregroundStyle(.gray)
-                        Text("Check your \(providerSelection.providerType.displayName) status")
+                        Text("Check your \(providerSelection.selectedProviderName) status")
                             .font(.headline)
                     }
                 }
@@ -75,7 +75,7 @@ struct ContentView: View {
                 lastChecked = Date()
                 WidgetCenter.shared.reloadAllTimelines()
             }
-            .onChange(of: providerSelection.providerType) { _, _ in
+            .onChange(of: providerSelection.selection) { _, _ in
                 Task {
                     await checker.checkStatus()
                     lastChecked = Date()
@@ -89,7 +89,7 @@ struct ContentView: View {
 struct VPNStatusView: View {
     let status: VPNStatus
     let selectedProviderName: String
-    @Binding var selectedProviderType: VPNProviderType
+    @Binding var selection: SelectedProvider
     let isLoading: Bool
 
     var body: some View {
@@ -107,9 +107,9 @@ struct VPNStatusView: View {
                 Text("Provider")
                     .foregroundStyle(.secondary)
                 Spacer()
-                Picker("Provider", selection: $selectedProviderType) {
+                Picker("Provider", selection: $selection) {
                     ForEach(VPNProviderType.allCases) { type in
-                        Text(type.displayName).tag(type)
+                        Text(type.displayName).tag(SelectedProvider.builtin(type))
                     }
                 }
                 .pickerStyle(.menu)
