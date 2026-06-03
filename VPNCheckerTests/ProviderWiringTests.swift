@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Combine
 import Testing
 @testable import Egress
 
@@ -223,6 +224,261 @@ struct ProviderPickerItemsTests {
         #expect(items.count == 5)
         #expect(items.suffix(2).map(\.selection) == [.custom(home.id), .custom(office.id)])
         #expect(items.suffix(2).map(\.label) == ["Home", "Office"])
+    }
+}
+
+// MARK: - Auto-load: ProviderSelection.reload
+
+@MainActor
+struct ProviderSelectionReloadTests {
+
+    @Test func reloadPicksUpChangedSelection() {
+        let selection = ProviderSelection(load: { AppConfig(selection: .builtin(.mullvad)) })
+        #expect(selection.selection == .builtin(.mullvad))
+
+        let home = CustomProvider(name: "Home", ranges: ["1.2.3.4"])
+        selection.reload(using: { AppConfig(customProviders: [home], selection: .custom(home.id)) })
+
+        #expect(selection.selection == .custom(home.id))
+    }
+
+    @Test func reloadEmitsOnceWhenSelectionChanges() {
+        let selection = ProviderSelection(load: { AppConfig(selection: .builtin(.mullvad)) })
+        var emissions = 0
+        let cancellable = selection.$selection.dropFirst().sink { _ in emissions += 1 }
+        defer { cancellable.cancel() }
+
+        selection.reload(using: { AppConfig(selection: .builtin(.ivpn)) })
+
+        #expect(emissions == 1)
+        #expect(selection.selection == .builtin(.ivpn))
+    }
+
+    @Test func reloadIsNoOpWhenSelectionUnchanged() {
+        let selection = ProviderSelection(load: { AppConfig(selection: .builtin(.ivpn)) })
+        var emissions = 0
+        let cancellable = selection.$selection.dropFirst().sink { _ in emissions += 1 }
+        defer { cancellable.cancel() }
+
+        selection.reload(using: { AppConfig(selection: .builtin(.ivpn)) })
+
+        #expect(emissions == 0)
+    }
+}
+
+// MARK: - Save: upsert into config
+
+struct AppConfigUpsertTests {
+
+    @Test func upsertAppendsNewProvider() {
+        var config = AppConfig.default
+        let p = CustomProvider(name: "Home", ranges: ["1.2.3.4"])
+        config.upsert(p)
+        #expect(config.customProviders == [p])
+    }
+
+    @Test func upsertReplacesExistingByID() {
+        let original = CustomProvider(name: "Home", ranges: ["1.2.3.4"])
+        var config = AppConfig(customProviders: [original], selection: .builtin(.mullvad))
+        let edited = CustomProvider(id: original.id, name: "Home HQ", ranges: ["1.2.3.4", "5.6.7.8"])
+        config.upsert(edited)
+        #expect(config.customProviders.count == 1)
+        #expect(config.customProviders.first == edited)
+    }
+}
+
+// MARK: - Save: provider validity
+
+struct CustomProviderValidityTests {
+
+    @Test func validWithNameAndValidRanges() {
+        #expect(CustomProvider(name: "Home", ranges: ["10.0.0.0/8"]).isValid)
+    }
+
+    @Test func invalidWhenNameBlank() {
+        #expect(!CustomProvider(name: "   ", ranges: ["1.2.3.4"]).isValid)
+    }
+
+    @Test func invalidWhenNoRanges() {
+        #expect(!CustomProvider(name: "Home", ranges: []).isValid)
+    }
+
+    @Test func invalidWhenRangeMalformed() {
+        #expect(!CustomProvider(name: "Home", ranges: ["nope"]).isValid)
+    }
+}
+
+// MARK: - Save: persistence
+
+struct CustomProviderSaverTests {
+
+    @Test func savingNewProviderPersistsIt() throws {
+        try withTempDirectory { dir in
+            let p = CustomProvider(name: "Home", ranges: ["1.2.3.4"])
+            let updated = try CustomProviderSaver.save(p, in: dir)
+            #expect(updated.customProviders == [p])
+            #expect(ConfigStore.load(from: dir).customProviders == [p])
+        }
+    }
+
+    @Test func savingExistingProviderUpdatesInPlace() throws {
+        try withTempDirectory { dir in
+            let original = CustomProvider(name: "Home", ranges: ["1.2.3.4"])
+            _ = try CustomProviderSaver.save(original, in: dir)
+            let edited = CustomProvider(id: original.id, name: "Home HQ", ranges: ["9.9.9.9"])
+            _ = try CustomProviderSaver.save(edited, in: dir)
+
+            let loaded = ConfigStore.load(from: dir)
+            #expect(loaded.customProviders.count == 1)
+            #expect(loaded.customProviders.first == edited)
+        }
+    }
+
+    @Test func savingInvalidProviderThrowsAndPersistsNothing() throws {
+        try withTempDirectory { dir in
+            #expect(throws: (any Error).self) {
+                _ = try CustomProviderSaver.save(CustomProvider(name: "", ranges: []), in: dir)
+            }
+            #expect(ConfigStore.load(from: dir) == AppConfig.default)
+        }
+    }
+}
+
+// MARK: - Editor: provider choices (picker incl. "Add Custom")
+
+struct ProviderChoiceItemsTests {
+
+    @Test func defaultListsBuiltinsThenAddCustom() {
+        let items = AppConfig.default.providerChoiceItems
+        #expect(items.map(\.choice) == [
+            .selection(.builtin(.mullvad)),
+            .selection(.builtin(.airvpn)),
+            .selection(.builtin(.ivpn)),
+            .addCustom,
+        ])
+        #expect(items.last?.label == "Add Custom…")
+    }
+
+    @Test func customProvidersAppearBeforeAddCustom() {
+        let home = CustomProvider(name: "Home", ranges: ["1.2.3.4"])
+        let config = AppConfig(customProviders: [home], selection: .builtin(.mullvad))
+        let items = config.providerChoiceItems
+        #expect(items.map(\.choice) == [
+            .selection(.builtin(.mullvad)),
+            .selection(.builtin(.airvpn)),
+            .selection(.builtin(.ivpn)),
+            .selection(.custom(home.id)),
+            .addCustom,
+        ])
+    }
+}
+
+// MARK: - Editor: conditional-display mapping
+
+struct ProviderEditorModeTests {
+
+    @Test func builtinSelectionHidesEditor() {
+        #expect(ProviderEditorMode(choice: .selection(.builtin(.mullvad))) == .hidden)
+    }
+
+    @Test func customSelectionEditsThatProvider() {
+        let id = UUID()
+        #expect(ProviderEditorMode(choice: .selection(.custom(id))) == .editing(id))
+    }
+
+    @Test func addCustomCreatesNew() {
+        #expect(ProviderEditorMode(choice: .addCustom) == .creating)
+    }
+}
+
+// MARK: - Editor: model behaviour
+
+@MainActor
+struct CustomProviderEditorModelTests {
+
+    @Test func addsValidHostAndCIDR() {
+        let m = CustomProviderEditorModel()
+        m.rangeInput = "203.0.113.7"; m.addRange()
+        m.rangeInput = "10.0.0.0/8"; m.addRange()
+        #expect(m.ranges == ["203.0.113.7", "10.0.0.0/8"])
+        #expect(m.rangeInput == "")
+        #expect(m.rangeInputError == nil)
+    }
+
+    @Test func trimsWhitespaceWhenAdding() {
+        let m = CustomProviderEditorModel()
+        m.rangeInput = "  1.2.3.4 "; m.addRange()
+        #expect(m.ranges == ["1.2.3.4"])
+    }
+
+    @Test func rejectsInvalidRange() {
+        let m = CustomProviderEditorModel()
+        m.rangeInput = "not-an-ip"; m.addRange()
+        #expect(m.ranges.isEmpty)
+        #expect(m.rangeInputError != nil)
+        #expect(m.rangeInput == "not-an-ip")   // input kept so the user can fix it
+    }
+
+    @Test func rejectsMalformedCIDR() {
+        let m = CustomProviderEditorModel()
+        m.rangeInput = "10.0.0.0/99"; m.addRange()
+        #expect(m.ranges.isEmpty)
+        #expect(m.rangeInputError != nil)
+    }
+
+    @Test func ignoresEmptyInput() {
+        let m = CustomProviderEditorModel()
+        m.rangeInput = "   "; m.addRange()
+        #expect(m.ranges.isEmpty)
+        #expect(m.rangeInputError == nil)
+    }
+
+    @Test func rejectsDuplicateRange() {
+        let m = CustomProviderEditorModel()
+        m.rangeInput = "1.2.3.4"; m.addRange()
+        m.rangeInput = "1.2.3.4"; m.addRange()
+        #expect(m.ranges == ["1.2.3.4"])
+        #expect(m.rangeInputError != nil)
+    }
+
+    @Test func removesRange() {
+        let m = CustomProviderEditorModel()
+        m.rangeInput = "1.2.3.4"; m.addRange()
+        m.rangeInput = "5.6.7.8"; m.addRange()
+        m.removeRange(at: IndexSet(integer: 0))
+        #expect(m.ranges == ["5.6.7.8"])
+    }
+
+    @Test func canSaveRequiresNameAndRanges() {
+        let m = CustomProviderEditorModel()
+        #expect(m.canSave == false)
+        m.name = "Home"
+        #expect(m.canSave == false)            // no ranges yet
+        m.rangeInput = "1.2.3.4"; m.addRange()
+        #expect(m.canSave == true)
+        m.name = "   "
+        #expect(m.canSave == false)            // whitespace-only name
+    }
+
+    @Test func newDraftHasFreshIDAndTrimmedName() {
+        let m = CustomProviderEditorModel()
+        m.startNew()
+        m.name = "  Home  "
+        m.rangeInput = "1.2.3.4"; m.addRange()
+        let draft = m.makeDraft()
+        #expect(draft.name == "Home")
+        #expect(draft.ranges == ["1.2.3.4"])
+    }
+
+    @Test func editingDraftPreservesID() {
+        let existing = CustomProvider(name: "Office", ranges: ["10.0.0.0/8"])
+        let m = CustomProviderEditorModel()
+        m.startEditing(existing)
+        m.name = "Office HQ"
+        let draft = m.makeDraft()
+        #expect(draft.id == existing.id)
+        #expect(draft.name == "Office HQ")
+        #expect(draft.ranges == ["10.0.0.0/8"])
     }
 }
 

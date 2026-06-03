@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 /// A selectable entry in the provider picker: a selection value plus its label.
-struct ProviderPickerItem: Identifiable, Hashable {
+nonisolated struct ProviderPickerItem: Identifiable, Hashable {
     let selection: SelectedProvider
     let label: String
     var id: SelectedProvider { selection }
@@ -20,17 +20,36 @@ extension AppConfig {
 class ProviderSelection: ObservableObject {
     static let shared = ProviderSelection()
 
-    @Published var selection: SelectedProvider {
-        didSet {
-            guard oldValue != selection else { return }
-            var config = ConfigStore.load()
-            config.selection = selection
-            ConfigStore.save(config)
-        }
+    /// The active selection. Written only via `select(_:)` (which persists) or
+    /// `reload(using:)` (which adopts what's already on disk).
+    @Published private(set) var selection: SelectedProvider
+
+    private let loadConfig: () -> AppConfig
+
+    /// - Parameter load: config source, injectable for tests. Defaults to the
+    ///   shared on-disk store.
+    init(load: @escaping () -> AppConfig = ConfigStore.load) {
+        self.loadConfig = load
+        self.selection = load().selection
     }
 
-    private init() {
-        selection = ConfigStore.load().selection
+    /// User-initiated change: adopt the new selection and persist it.
+    func select(_ newValue: SelectedProvider) {
+        guard newValue != selection else { return }
+        selection = newValue
+        var config = ConfigStore.load()
+        config.selection = newValue
+        ConfigStore.save(config)
+    }
+
+    /// Re-read the persisted selection and adopt it if it changed. Lets the UI
+    /// pick up config written elsewhere (another scene now; iCloud in a later task)
+    /// without restarting. Emits only on an actual change; does not persist, since
+    /// the value already came from disk.
+    func reload(using load: (() -> AppConfig)? = nil) {
+        let persisted = (load ?? loadConfig)().selection
+        guard persisted != selection else { return }
+        selection = persisted
     }
 
     /// Display name for the current selection, resolving custom provider names

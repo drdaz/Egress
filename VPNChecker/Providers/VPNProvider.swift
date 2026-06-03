@@ -112,6 +112,13 @@ nonisolated struct CustomProvider: Codable, Equatable, Identifiable {
 }
 
 extension CustomProvider {
+    /// Savable when it has a non-empty name and at least one valid IP/CIDR range.
+    nonisolated var isValid: Bool {
+        !name.trimmingCharacters(in: .whitespaces).isEmpty
+            && !ranges.isEmpty
+            && ((try? IPMatcher(rules: ranges)) != nil)
+    }
+
     /// Builds the runtime provider that checks the current egress IP against this
     /// provider's ranges. Mirrors `VPNProviderType.makeProvider()`.
     /// - Parameter resolver: egress resolver (injected so tests can avoid the network).

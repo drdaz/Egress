@@ -13,6 +13,7 @@ struct ContentView: View {
     @ObservedObject private var providerSelection = ProviderSelection.shared
     @State private var lastChecked: Date?
     @State private var showingSettings = false
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         NavigationStack {
@@ -69,6 +70,9 @@ struct ContentView: View {
             .padding()
             .navigationTitle("Egress")
             .navigationSubtitle("VPN Checker")
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
             .task {
                 await checker.checkStatus()
                 lastChecked = Date()
@@ -80,6 +84,10 @@ struct ContentView: View {
                     lastChecked = Date()
                     WidgetCenter.shared.reloadAllTimelines()
                 }
+            }
+            .onChange(of: scenePhase) { _, phase in
+                // Pick up config changed elsewhere (other scene now, iCloud later).
+                if phase == .active { providerSelection.reload() }
             }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {

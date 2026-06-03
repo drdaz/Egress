@@ -30,6 +30,15 @@ extension AppConfig {
         customProviders.first { $0.id == id }
     }
 
+    /// Inserts the provider, or replaces the existing one with the same id.
+    nonisolated mutating func upsert(_ provider: CustomProvider) {
+        if let index = customProviders.firstIndex(where: { $0.id == provider.id }) {
+            customProviders[index] = provider
+        } else {
+            customProviders.append(provider)
+        }
+    }
+
     /// Display name for the current selection. Falls back to the default built-in's
     /// name when a `.custom` selection references an id that no longer exists.
     var selectedProviderName: String {
@@ -63,7 +72,7 @@ extension AppConfig {
 
 /// Loads and saves `AppConfig` to a JSON file in the shared App Group container
 /// so the main app and the widget see the same config.
-enum ConfigStore {
+nonisolated enum ConfigStore {
     /// Shared App Group identifier. Both the main app and the widget extension
     /// must enable the "App Groups" capability with this identifier in Xcode.
     static let appGroupIdentifier = "group.dk.montnoir.Egress"
@@ -157,5 +166,48 @@ class VPNStatusChecker: ObservableObject {
         let config = ConfigStore.load()
         let actualProvider = try provider ?? config.makeSelectedProvider()
         return try await actualProvider.checkStatus()
+    }
+}
+
+nonisolated enum CustomProviderSaveError: LocalizedError {
+    case invalidProvider
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidProvider:
+            return "A custom provider needs a name and at least one valid IP/CIDR range."
+        }
+    }
+}
+
+/// Persists a custom provider into the shared config, creating it or updating the
+/// existing one with the same id.
+nonisolated enum CustomProviderSaver {
+    /// Save into the real shared container (App Group), so the app and widget agree.
+    @discardableResult
+    static func save(_ provider: CustomProvider) throws -> AppConfig {
+        try save(provider, load: ConfigStore.load, persist: ConfigStore.save)
+    }
+
+    /// Save into a specific directory. Injectable for tests.
+    @discardableResult
+    static func save(_ provider: CustomProvider, in directory: URL) throws -> AppConfig {
+        try save(
+            provider,
+            load: { ConfigStore.load(from: directory) },
+            persist: { ConfigStore.save($0, to: directory) }
+        )
+    }
+
+    private static func save(
+        _ provider: CustomProvider,
+        load: () -> AppConfig,
+        persist: (AppConfig) -> Void
+    ) throws -> AppConfig {
+        guard provider.isValid else { throw CustomProviderSaveError.invalidProvider }
+        var config = load()
+        config.upsert(provider)
+        persist(config)
+        return config
     }
 }
