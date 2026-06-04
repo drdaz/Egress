@@ -25,18 +25,31 @@ struct SettingsView: View {
             }
 
             if mode != .hidden {
-                CustomProviderEditorView(editor: editor) { draft in
-                    guard (try? CustomProviderSaver.save(draft)) != nil else { return }
-                    // Adopt the saved id so a subsequent Save updates this provider
-                    // instead of creating a duplicate.
-                    editor.startEditing(draft)
-                    // Auto-select the just-saved provider: setting `choice` cascades
-                    // through onChange to update the active selection and editor mode.
-                    choice = .selection(.custom(draft.id))
-                    // Mirror the change to iCloud (covers same-id edits, where the
-                    // choice doesn't change and onChange wouldn't fire).
-                    CloudConfigSync.shared.push()
-                }
+                CustomProviderEditorView(
+                    editor: editor,
+                    onSave: { draft in
+                        guard (try? CustomProviderSaver.save(draft)) != nil else { return }
+                        // Adopt the saved id so a subsequent Save updates this provider
+                        // instead of creating a duplicate.
+                        editor.startEditing(draft)
+                        // Auto-select the just-saved provider: setting `choice` cascades
+                        // through onChange to update the active selection and editor mode.
+                        choice = .selection(.custom(draft.id))
+                        // Mirror the change to iCloud (covers same-id edits, where the
+                        // choice doesn't change and onChange wouldn't fire).
+                        CloudConfigSync.shared.push()
+                    },
+                    onRemove: {
+                        guard let id = editor.editingID else { return }
+                        CustomProviderSaver.remove(id: id)
+                        CloudConfigSync.shared.push()
+                        // Pick up the post-removal selection (reset to default if it
+                        // was the removed provider) and reflect it in the picker, which
+                        // hides the editor.
+                        providerSelection.reload()
+                        choice = .selection(providerSelection.selection)
+                    }
+                )
             }
         }
         .onAppear { syncEditor(to: choice) }

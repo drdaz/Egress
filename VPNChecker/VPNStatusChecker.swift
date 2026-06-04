@@ -39,6 +39,15 @@ extension AppConfig {
         }
     }
 
+    /// Removes the custom provider with the given id. If it was the active
+    /// selection, falls back to the default provider.
+    nonisolated mutating func removeProvider(id: UUID) {
+        customProviders.removeAll { $0.id == id }
+        if selection == .custom(id) {
+            selection = .default
+        }
+    }
+
     /// Fold cloud-synced custom providers into this config. Providers are unioned
     /// by id (cloud wins on a conflict). The selection is intentionally NOT synced —
     /// it stays per-device, so the local selection is always kept.
@@ -218,6 +227,33 @@ nonisolated enum CustomProviderSaver {
         guard provider.isValid else { throw CustomProviderSaveError.invalidProvider }
         var config = load()
         config.upsert(provider)
+        persist(config)
+        return config
+    }
+
+    /// Remove a custom provider from the real shared container.
+    @discardableResult
+    static func remove(id: UUID) -> AppConfig {
+        remove(id: id, load: ConfigStore.load, persist: ConfigStore.save)
+    }
+
+    /// Remove a custom provider from a specific directory. Injectable for tests.
+    @discardableResult
+    static func remove(id: UUID, in directory: URL) -> AppConfig {
+        remove(
+            id: id,
+            load: { ConfigStore.load(from: directory) },
+            persist: { ConfigStore.save($0, to: directory) }
+        )
+    }
+
+    private static func remove(
+        id: UUID,
+        load: () -> AppConfig,
+        persist: (AppConfig) -> Void
+    ) -> AppConfig {
+        var config = load()
+        config.removeProvider(id: id)
         persist(config)
         return config
     }

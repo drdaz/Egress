@@ -87,8 +87,9 @@ struct ContentView: View {
                 }
             }
             .onChange(of: scenePhase) { _, phase in
-                // Pick up config changed elsewhere (other scene now, iCloud later).
-                if phase == .active { providerSelection.reload() }
+                // On returning to the foreground, reconcile with iCloud (pull +
+                // merge); this also refreshes the local selection and the widgets.
+                if phase == .active { CloudConfigSync.shared.applyCloud() }
             }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {

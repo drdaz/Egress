@@ -136,6 +136,14 @@ final class CustomProviderEditorModel: ObservableObject {
 struct CustomProviderEditorView: View {
     @ObservedObject var editor: CustomProviderEditorModel
     var onSave: (CustomProvider) -> Void
+    var onRemove: () -> Void = {}
+
+    @State private var showingRemoveConfirmation = false
+
+    private var removeConfirmationTitle: String {
+        let name = editor.name.trimmingCharacters(in: .whitespaces)
+        return name.isEmpty ? "Remove this provider?" : "Remove “\(name)”?"
+    }
 
     var body: some View {
         Section("Custom Provider") {
@@ -172,18 +180,34 @@ struct CustomProviderEditorView: View {
                     .foregroundStyle(.red)
             }
 
-            // The ranges table and Save button appear once at least one valid
-            // range has been added.
+            // The ranges table appears once at least one valid range is added.
             if !editor.ranges.isEmpty {
                 ForEach(editor.ranges, id: \.self) { range in
                     Text(range)
                 }
                 .onDelete { editor.removeRange(at: $0) }
+            }
 
+            // Remove is available whenever editing an existing provider; Save
+            // appears once there's at least one range.
+            if editor.editingID != nil || !editor.ranges.isEmpty {
                 HStack {
+                    if editor.editingID != nil {
+                        Button("Remove", role: .destructive) { showingRemoveConfirmation = true }
+                            .confirmationDialog(
+                                removeConfirmationTitle,
+                                isPresented: $showingRemoveConfirmation,
+                                titleVisibility: .visible
+                            ) {
+                                Button("Remove", role: .destructive) { onRemove() }
+                                Button("Cancel", role: .cancel) {}
+                            }
+                    }
                     Spacer()
-                    Button("Save") { onSave(editor.makeDraft()) }
-                        .disabled(!editor.canSave)
+                    if !editor.ranges.isEmpty {
+                        Button("Save") { onSave(editor.makeDraft()) }
+                            .disabled(!editor.canSave)
+                    }
                 }
             }
         }

@@ -287,6 +287,46 @@ struct AppConfigUpsertTests {
     }
 }
 
+// MARK: - Remove
+
+struct AppConfigRemoveTests {
+
+    @Test func removesProviderByID() {
+        let a = CustomProvider(name: "A", ranges: ["1.1.1.1"])
+        let b = CustomProvider(name: "B", ranges: ["2.2.2.2"])
+        var config = AppConfig(customProviders: [a, b], selection: .builtin(.mullvad))
+        config.removeProvider(id: a.id)
+        #expect(config.customProviders.map(\.id) == [b.id])
+    }
+
+    @Test func resetsSelectionWhenRemovingSelectedProvider() {
+        let a = CustomProvider(name: "A", ranges: ["1.1.1.1"])
+        var config = AppConfig(customProviders: [a], selection: .custom(a.id))
+        config.removeProvider(id: a.id)
+        #expect(config.customProviders.isEmpty)
+        #expect(config.selection == .default)
+    }
+
+    @Test func keepsSelectionWhenRemovingADifferentProvider() {
+        let a = CustomProvider(name: "A", ranges: ["1.1.1.1"])
+        let b = CustomProvider(name: "B", ranges: ["2.2.2.2"])
+        var config = AppConfig(customProviders: [a, b], selection: .custom(b.id))
+        config.removeProvider(id: a.id)
+        #expect(config.selection == .custom(b.id))
+    }
+
+    @Test func saverRemovePersists() throws {
+        try withTempDirectory { dir in
+            let a = CustomProvider(name: "A", ranges: ["1.1.1.1"])
+            _ = try CustomProviderSaver.save(a, in: dir)
+
+            CustomProviderSaver.remove(id: a.id, in: dir)
+
+            #expect(ConfigStore.load(from: dir).customProviders.isEmpty)
+        }
+    }
+}
+
 // MARK: - Save: provider validity
 
 struct CustomProviderValidityTests {
