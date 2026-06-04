@@ -74,6 +74,7 @@ struct ContentView: View {
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .task {
+                CloudConfigSync.shared.start()
                 await checker.checkStatus()
                 lastChecked = Date()
                 WidgetCenter.shared.reloadAllTimelines()

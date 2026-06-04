@@ -344,6 +344,121 @@ struct CustomProviderSaverTests {
     }
 }
 
+// MARK: - iCloud: merge / precedence
+
+struct AppConfigMergeTests {
+
+    @Test func unionsCloudProvidersKeepingLocalSelection() {
+        let a = CustomProvider(name: "A", ranges: ["1.1.1.1"])
+        let b = CustomProvider(name: "B", ranges: ["2.2.2.2"])
+        let local = AppConfig(customProviders: [a], selection: .custom(a.id))
+
+        let merged = local.mergingCustomProviders([b])
+
+        #expect(Set(merged.customProviders.map(\.id)) == Set([a.id, b.id]))
+        #expect(merged.selection == .custom(a.id))   // selection is per-device, stays local
+    }
+
+    @Test func cloudWinsOnIDConflict() {
+        let id = UUID()
+        let local = AppConfig(customProviders: [CustomProvider(id: id, name: "Old", ranges: ["1.1.1.1"])],
+                              selection: .builtin(.mullvad))
+
+        let merged = local.mergingCustomProviders([CustomProvider(id: id, name: "New", ranges: ["3.3.3.3"])])
+
+        #expect(merged.customProviders.count == 1)
+        #expect(merged.customProviders.first?.name == "New")
+        #expect(merged.selection == .builtin(.mullvad))   // local selection untouched
+    }
+
+    @Test func selectionNeverComesFromCloud() {
+        let local = AppConfig(customProviders: [], selection: .builtin(.airvpn))
+        let merged = local.mergingCustomProviders([CustomProvider(name: "Cloud", ranges: ["9.9.9.9"])])
+        #expect(merged.selection == .builtin(.airvpn))
+    }
+
+    @Test func encodedProvidersStayWithinKVSLimits() throws {
+        let providers = (0..<100).map { CustomProvider(name: "Provider \($0)", ranges: ["10.0.\($0).0/24"]) }
+        let data = try JSONEncoder().encode(providers)
+        #expect(data.count < 1_000_000)   // NSUbiquitousKeyValueStore per-value limit
+    }
+}
+
+// MARK: - iCloud: sync coordinator
+
+private final class FakeKVStore: KeyValueSyncing, @unchecked Sendable {
+    var storage: [String: Data] = [:]
+    private let subject = PassthroughSubject<Void, Never>()
+    func data(forKey key: String) -> Data? { storage[key] }
+    func set(_ data: Data?, forKey key: String) { storage[key] = data }
+    @discardableResult func synchronize() -> Bool { true }
+    var externalChanges: AnyPublisher<Void, Never> { subject.eraseToAnyPublisher() }
+    func fireExternalChange() { subject.send() }
+}
+
+@MainActor
+struct CloudConfigSyncTests {
+
+    @Test func pushWritesEncodedLocalProviders() throws {
+        let store = FakeKVStore()
+        let providers = [CustomProvider(name: "Home", ranges: ["1.2.3.4"])]
+        let local = AppConfig(customProviders: providers, selection: .builtin(.mullvad))
+        let sync = CloudConfigSync(store: store, load: { local }, persist: { _ in }, onApplied: {})
+
+        sync.push()
+
+        let data = try #require(store.storage[CloudConfigSync.key])
+        #expect(try JSONDecoder().decode([CustomProvider].self, from: data) == providers)
+    }
+
+    @Test func applyCloudSeedsCloudWhenEmpty() {
+        let store = FakeKVStore()
+        let local = AppConfig(customProviders: [CustomProvider(name: "Home", ranges: ["1.2.3.4"])],
+                              selection: .builtin(.ivpn))
+        var persisted: AppConfig?
+        let sync = CloudConfigSync(store: store, load: { local }, persist: { persisted = $0 }, onApplied: {})
+
+        sync.applyCloud()
+
+        #expect(store.storage[CloudConfigSync.key] != nil)   // local providers pushed up
+        #expect(persisted == nil)                            // nothing pulled down
+    }
+
+    @Test func applyCloudMergesProvidersKeepingLocalSelection() throws {
+        let store = FakeKVStore()
+        let cloudProvider = CustomProvider(name: "Cloud", ranges: ["9.9.9.9"])
+        store.storage[CloudConfigSync.key] = try JSONEncoder().encode([cloudProvider])
+        let localProvider = CustomProvider(name: "Local", ranges: ["1.1.1.1"])
+        let local = AppConfig(customProviders: [localProvider], selection: .builtin(.mullvad))
+
+        var persisted: AppConfig?
+        var applied = 0
+        let sync = CloudConfigSync(store: store, load: { local }, persist: { persisted = $0 }, onApplied: { applied += 1 })
+
+        sync.applyCloud()
+
+        let result = try #require(persisted)
+        #expect(Set(result.customProviders.map(\.id)) == Set([cloudProvider.id, localProvider.id]))
+        #expect(result.selection == .builtin(.mullvad))   // selection stays local
+        #expect(applied == 1)
+    }
+
+    @Test func externalChangeTriggersApply() throws {
+        let store = FakeKVStore()
+        let cloudProvider = CustomProvider(name: "Cloud", ranges: ["9.9.9.9"])
+        store.storage[CloudConfigSync.key] = try JSONEncoder().encode([cloudProvider])
+
+        var applied = 0
+        let sync = CloudConfigSync(store: store, load: { .default }, persist: { _ in }, onApplied: { applied += 1 })
+
+        sync.start()
+        let afterStart = applied
+        store.fireExternalChange()
+
+        #expect(applied == afterStart + 1)
+    }
+}
+
 // MARK: - Editor: provider choices (picker incl. "Add Custom")
 
 struct ProviderChoiceItemsTests {

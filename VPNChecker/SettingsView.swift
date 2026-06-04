@@ -33,6 +33,9 @@ struct SettingsView: View {
                     // Auto-select the just-saved provider: setting `choice` cascades
                     // through onChange to update the active selection and editor mode.
                     choice = .selection(.custom(draft.id))
+                    // Mirror the change to iCloud (covers same-id edits, where the
+                    // choice doesn't change and onChange wouldn't fire).
+                    CloudConfigSync.shared.push()
                 }
             }
         }
@@ -42,6 +45,7 @@ struct SettingsView: View {
                 providerSelection.select(selection)
             }
             syncEditor(to: newChoice)
+            // Note: selection is per-device and intentionally not pushed to iCloud.
         }
         #if os(macOS)
         .formStyle(.grouped)

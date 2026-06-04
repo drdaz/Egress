@@ -39,6 +39,17 @@ extension AppConfig {
         }
     }
 
+    /// Fold cloud-synced custom providers into this config. Providers are unioned
+    /// by id (cloud wins on a conflict). The selection is intentionally NOT synced —
+    /// it stays per-device, so the local selection is always kept.
+    nonisolated func mergingCustomProviders(_ cloudProviders: [CustomProvider]) -> AppConfig {
+        var providers = cloudProviders
+        for local in customProviders where !providers.contains(where: { $0.id == local.id }) {
+            providers.append(local)
+        }
+        return AppConfig(customProviders: providers, selection: selection)
+    }
+
     /// Display name for the current selection. Falls back to the default built-in's
     /// name when a `.custom` selection references an id that no longer exists.
     var selectedProviderName: String {
