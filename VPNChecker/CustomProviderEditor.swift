@@ -114,6 +114,12 @@ final class CustomProviderEditorModel: ObservableObject {
         ranges.remove(atOffsets: offsets)
     }
 
+    /// Remove a specific range value (used by the per-row delete button, which
+    /// works on macOS where swipe-to-delete isn't available).
+    func removeRange(_ range: String) {
+        ranges.removeAll { $0 == range }
+    }
+
     /// True when the provider has a non-empty name and at least one range.
     var canSave: Bool {
         !name.trimmingCharacters(in: .whitespaces).isEmpty && !ranges.isEmpty
@@ -181,9 +187,16 @@ struct CustomProviderEditorView: View {
             }
 
             // The ranges table appears once at least one valid range is added.
+            // Removal: right-click (macOS) / long-press (iOS) → Remove; iOS also
+            // keeps swipe-to-delete via onDelete.
             if !editor.ranges.isEmpty {
                 ForEach(editor.ranges, id: \.self) { range in
                     Text(range)
+                        .contextMenu {
+                            Button("Remove", role: .destructive) {
+                                editor.removeRange(range)
+                            }
+                        }
                 }
                 .onDelete { editor.removeRange(at: $0) }
             }

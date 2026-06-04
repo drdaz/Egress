@@ -116,6 +116,14 @@ struct CustomProviderEditorModelTests {
         #expect(m.ranges == ["5.6.7.8"])
     }
 
+    @Test func removesRangeByValue() {
+        let m = CustomProviderEditorModel()
+        m.rangeInput = "1.2.3.4"; m.addRange()
+        m.rangeInput = "5.6.7.8"; m.addRange()
+        m.removeRange("1.2.3.4")
+        #expect(m.ranges == ["5.6.7.8"])
+    }
+
     @Test func canSaveRequiresNameAndRanges() {
         let m = CustomProviderEditorModel()
         #expect(m.canSave == false)
