@@ -194,6 +194,7 @@ struct CustomProviderEditorView: View {
                 HStack {
                     if editor.editingID != nil {
                         Button("Remove", role: .destructive) { showingRemoveConfirmation = true }
+                            .buttonStyle(.borderless)
                             .confirmationDialog(
                                 removeConfirmationTitle,
                                 isPresented: $showingRemoveConfirmation,
@@ -206,6 +207,7 @@ struct CustomProviderEditorView: View {
                     Spacer()
                     if !editor.ranges.isEmpty {
                         Button("Save") { onSave(editor.makeDraft()) }
+                            .buttonStyle(.borderless)
                             .disabled(!editor.canSave)
                     }
                 }
