@@ -148,7 +148,7 @@ struct CustomProviderEditorModelTests {
     @Test func editingDraftPreservesID() {
         let existing = CustomProvider(name: "Office", ranges: ["10.0.0.0/8"])
         let m = CustomProviderEditorModel()
-        m.startEditing(existing)
+        m.populate(with: existing)
         m.name = "Office HQ"
         let draft = m.makeDraft()
         #expect(draft.id == existing.id)

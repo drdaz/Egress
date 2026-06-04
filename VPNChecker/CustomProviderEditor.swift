@@ -79,7 +79,7 @@ final class CustomProviderEditorModel: ObservableObject {
     }
 
     /// Load an existing provider's values for editing.
-    func startEditing(_ provider: CustomProvider) {
+    func populate(with provider: CustomProvider) {
         editingID = provider.id
         name = provider.name
         ranges = provider.ranges
@@ -254,7 +254,7 @@ private struct EditorPreviewContainer: View {
 #Preview("Editing") {
     let model: CustomProviderEditorModel = {
         let m = CustomProviderEditorModel()
-        m.startEditing(CustomProvider(name: "Home network", ranges: ["192.168.1.0/24", "203.0.113.7"]))
+        m.populate(with: CustomProvider(name: "Home network", ranges: ["192.168.1.0/24", "203.0.113.7"]))
         return m
     }()
     EditorPreviewContainer(model: model)

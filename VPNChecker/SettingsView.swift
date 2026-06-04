@@ -31,7 +31,7 @@ struct SettingsView: View {
                         guard (try? CustomProviderSaver.save(draft)) != nil else { return }
                         // Adopt the saved id so a subsequent Save updates this provider
                         // instead of creating a duplicate.
-                        editor.startEditing(draft)
+                        editor.populate(with: draft)
                         // Auto-select the just-saved provider: setting `choice` cascades
                         // through onChange to update the active selection and editor mode.
                         choice = .selection(.custom(draft.id))
@@ -72,7 +72,7 @@ struct SettingsView: View {
         switch choice {
         case .selection(.custom(let id)):
             if let provider = ConfigStore.load().customProvider(withID: id) {
-                editor.startEditing(provider)
+                editor.populate(with: provider)
             }
         case .addCustom:
             editor.startNew()
