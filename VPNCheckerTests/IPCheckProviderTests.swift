@@ -9,20 +9,7 @@
 import Testing
 @testable import Egress
 
-/// Test double that returns a fixed result instead of hitting the network.
-private struct StubResolver: CurrentIPResolver {
-    let result: Result<EgressInfo, Error>
-    func resolve() async throws -> EgressInfo { try result.get() }
-}
-
-private func info(
-    _ ip: String,
-    country: String? = "Testland",
-    city: String? = "Testville",
-    organization: String? = "TestOrg"
-) -> EgressInfo {
-    EgressInfo(ipAddress: ip, country: country, city: city, organization: organization)
-}
+// StubResolver and info(...) live in ProviderTestSupport.swift.
 
 struct IPCheckProviderTests {
 
