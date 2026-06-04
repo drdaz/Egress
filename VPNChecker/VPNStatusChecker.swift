@@ -15,13 +15,38 @@ nonisolated struct AppConfig: Codable, Equatable {
     var customProviders: [CustomProvider]
     /// The currently selected provider (built-in or custom).
     var selection: SelectedProvider
+    /// When `customProviders` last changed locally. Drives last-write-wins iCloud
+    /// sync (the selection itself is per-device and not synced).
+    var providersModifiedAt: Date
 
     static let `default` = AppConfig(customProviders: [], selection: .default)
 
-    init(customProviders: [CustomProvider] = [], selection: SelectedProvider = .default) {
+    init(customProviders: [CustomProvider] = [], selection: SelectedProvider = .default,
+         providersModifiedAt: Date = .distantPast) {
         self.customProviders = customProviders
         self.selection = selection
+        self.providersModifiedAt = providersModifiedAt
     }
+
+    enum CodingKeys: String, CodingKey {
+        case customProviders, selection, providersModifiedAt
+    }
+
+    /// Tolerant decoding so a config written before a field existed still loads
+    /// (missing keys fall back to defaults instead of failing the whole decode).
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        customProviders = try container.decodeIfPresent([CustomProvider].self, forKey: .customProviders) ?? []
+        selection = try container.decodeIfPresent(SelectedProvider.self, forKey: .selection) ?? .default
+        providersModifiedAt = try container.decodeIfPresent(Date.self, forKey: .providersModifiedAt) ?? .distantPast
+    }
+}
+
+/// The iCloud-synced payload: the custom providers plus when they last changed.
+/// Only the providers sync — the selected provider stays per-device.
+nonisolated struct SyncedProviders: Codable, Equatable {
+    var providers: [CustomProvider]
+    var modifiedAt: Date
 }
 
 extension AppConfig {
@@ -48,15 +73,19 @@ extension AppConfig {
         }
     }
 
-    /// Fold cloud-synced custom providers into this config. Providers are unioned
-    /// by id (cloud wins on a conflict). The selection is intentionally NOT synced —
-    /// it stays per-device, so the local selection is always kept.
-    nonisolated func mergingCustomProviders(_ cloudProviders: [CustomProvider]) -> AppConfig {
-        var providers = cloudProviders
-        for local in customProviders where !providers.contains(where: { $0.id == local.id }) {
-            providers.append(local)
+    /// Replace this config's custom providers with a newer cloud copy (last-write-
+    /// wins — the caller decides "newer" via `modifiedAt`). The selection is
+    /// per-device so it's kept, unless it pointed at a provider the newer list no
+    /// longer contains, in which case it falls back to the default.
+    nonisolated func adoptingCustomProviders(_ cloud: SyncedProviders) -> AppConfig {
+        var copy = self
+        copy.customProviders = cloud.providers
+        copy.providersModifiedAt = cloud.modifiedAt
+        if case .custom(let id) = copy.selection,
+           !cloud.providers.contains(where: { $0.id == id }) {
+            copy.selection = .default
         }
-        return AppConfig(customProviders: providers, selection: selection)
+        return copy
     }
 
     /// Display name for the current selection. Falls back to the default built-in's
@@ -227,6 +256,7 @@ nonisolated enum CustomProviderSaver {
         guard provider.isValid else { throw CustomProviderSaveError.invalidProvider }
         var config = load()
         config.upsert(provider)
+        config.providersModifiedAt = Date()
         persist(config)
         return config
     }
@@ -254,6 +284,7 @@ nonisolated enum CustomProviderSaver {
     ) -> AppConfig {
         var config = load()
         config.removeProvider(id: id)
+        config.providersModifiedAt = Date()
         persist(config)
         return config
     }

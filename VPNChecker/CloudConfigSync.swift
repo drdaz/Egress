@@ -44,13 +44,18 @@ nonisolated final class UbiquitousKeyValueStore: KeyValueSyncing {
 /// changes back into the local config (then triggers the same-device reload path).
 @MainActor
 final class CloudConfigSync {
-    /// Only the custom providers are synced; the selected provider stays per-device.
-    static let key = "customProviders.v1"
+    /// Only the custom providers are synced (with a timestamp for last-write-wins);
+    /// the selected provider stays per-device.
+    static let key = "customProviders.v2"
 
     static let shared = CloudConfigSync(
         store: UbiquitousKeyValueStore(),
         onApplied: {
+            // reload() adopts any selection change (e.g. a synced deletion that
+            // dropped the selected provider); refresh() re-renders views that read
+            // the provider list (the persistent macOS Settings window).
             ProviderSelection.shared.reload()
+            ProviderSelection.shared.refresh()
             WidgetCenter.shared.reloadAllTimelines()
         }
     )
@@ -82,22 +87,31 @@ final class CloudConfigSync {
         }
     }
 
-    /// Mirror the current local custom providers up to iCloud.
+    /// Mirror the current local custom providers (with their timestamp) up to iCloud.
     func push() {
-        guard let data = try? JSONEncoder().encode(load().customProviders) else { return }
+        let local = load()
+        let payload = SyncedProviders(providers: local.customProviders, modifiedAt: local.providersModifiedAt)
+        guard let data = try? JSONEncoder().encode(payload) else { return }
         store.set(data, forKey: Self.key)
         _ = store.synchronize()
     }
 
-    /// Pull the cloud providers, merge them into local (keeping the local
-    /// selection), persist, and notify. If the cloud has nothing yet, seed it.
+    /// Reconcile local and cloud by last-write-wins. If the cloud copy is newer,
+    /// adopt it (keeping the local selection), persist, and notify. If local is
+    /// newer (or the cloud has nothing yet), push local up instead.
     func applyCloud() {
         guard let data = store.data(forKey: Self.key),
-              let cloudProviders = try? JSONDecoder().decode([CustomProvider].self, from: data) else {
+              let cloud = try? JSONDecoder().decode(SyncedProviders.self, from: data) else {
             push()
             return
         }
-        persist(load().mergingCustomProviders(cloudProviders))
-        onApplied()
+        let local = load()
+        if cloud.modifiedAt > local.providersModifiedAt {
+            persist(local.adoptingCustomProviders(cloud))
+            onApplied()
+        } else if local.providersModifiedAt > cloud.modifiedAt {
+            push()
+        }
+        // Equal timestamps → already in sync; do nothing.
     }
 }

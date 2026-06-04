@@ -52,6 +52,13 @@ class ProviderSelection: ObservableObject {
         selection = persisted
     }
 
+    /// Notify observers that the persisted config changed in a way the `selection`
+    /// value doesn't capture — e.g. the custom-provider list changed (synced in from
+    /// iCloud) — so views re-read derived data like the picker list.
+    func refresh() {
+        objectWillChange.send()
+    }
+
     /// Display name for the current selection, resolving custom provider names
     /// from the persisted config.
     var selectedProviderName: String {
