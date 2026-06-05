@@ -1,0 +1,44 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Review this pull request. It's a Swift / Xcode app (iOS + macOS).
+            Focus on:
+            - Correctness bugs and logic errors
+            - Concurrency / actor-isolation issues (this project defaults to
+              @MainActor; the provider/data subsystem is explicitly nonisolated)
+            - Memory and retain-cycle issues
+            - Security implications
+            - Reuse, simplification, and clarity
+
+            The PR branch is already checked out in the working directory.
+            Use `gh pr comment` for top-level summary feedback.
+            Use `mcp__github_inline_comment__create_inline_comment` (with
+            `confirmed: true`) for specific line-level issues.
+            Only post feedback via GitHub comments — don't reply as a message.
+            If the diff is clean, say so briefly. Don't invent nits.
+
+          claude_args: |
+            --max-turns 20
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"

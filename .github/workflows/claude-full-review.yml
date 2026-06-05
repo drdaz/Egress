@@ -1,0 +1,51 @@
+name: Claude Full Codebase Review
+
+# Manual, on-demand review of the ENTIRE codebase (not just a diff).
+# Run it from the Actions tab → "Claude Full Codebase Review" → Run workflow.
+# Findings are filed as a new GitHub issue.
+on:
+  workflow_dispatch:
+    inputs:
+      focus:
+        description: "Optional area to focus on (e.g. 'concurrency', 'the widget'). Leave blank for a general sweep."
+        required: false
+        default: ""
+
+jobs:
+  full-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Perform a review of the ENTIRE codebase in the current working
+            directory. This is a Swift / Xcode app (iOS + macOS) with a widget
+            extension. The whole repo is checked out — explore it yourself.
+
+            Optional focus area: "${{ github.event.inputs.focus }}"
+            (If blank, do a general sweep.)
+
+            Look for:
+            - Correctness bugs and logic errors
+            - Concurrency / actor-isolation issues (project defaults to
+              @MainActor; the provider/data subsystem is explicitly nonisolated)
+            - Memory and retain-cycle issues
+            - Security implications
+            - Reuse, simplification, and clarity opportunities
+
+            When done, file a single GitHub issue summarizing your findings,
+            grouped by severity, with `file:line` references. Use:
+            `gh issue create --title "Claude codebase review" --body "<markdown>"`
+            Do not open more than one issue. If the codebase is clean, still
+            file one issue saying so.
+
+          claude_args: |
+            --max-turns 40
+            --allowedTools "Bash(gh issue create:*),Bash(gh issue list:*)"
