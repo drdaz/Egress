@@ -90,6 +90,14 @@ struct SettingsView: View {
             syncEditor(to: newChoice)
             // Note: selection is per-device and intentionally not pushed to iCloud.
         }
+        .onChange(of: providerSelection.selection) { _, newSelection in
+            // Reconcile with a selection changed elsewhere (e.g. an iCloud sync
+            // that deleted the selected custom provider and reset us to default),
+            // so the picker doesn't keep pointing at a now-missing provider.
+            // Guarded so we don't clobber an in-progress "Add Custom" choice.
+            guard choice != .selection(newSelection) else { return }
+            choice = .selection(newSelection)
+        }
     }
 
     /// Configure the editor's contents to match the current choice (without
