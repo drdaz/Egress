@@ -214,24 +214,18 @@ struct MediumVPNWidgetView: View {
                         
                         Text(entry.selectedProviderName)
                             .font(.subheadline)
-//                            .foregroundStyle(.secondary)
 
                         if let server = status.serverName {
                             Text(server)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
-
-//                        Text(status.locationDescription)
-//                            .font(.caption)
-//                            .foregroundStyle(.secondary)
                     } else {
                         Text("Not connected")
                             .font(.headline)
                             .fontWeight(.bold)
                         Text(entry.selectedProviderName)
                             .font(.subheadline)
-//                            .foregroundStyle(.secondary)
                         Text(status.ipAddress)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
