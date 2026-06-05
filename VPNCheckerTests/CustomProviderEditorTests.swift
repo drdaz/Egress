@@ -145,6 +145,25 @@ struct CustomProviderEditorModelTests {
         #expect(draft.ranges == ["1.2.3.4"])
     }
 
+    @Test func nameSaveOnlyWhenEditingAndNameChanged() {
+        let m = CustomProviderEditorModel()
+
+        // Creating: no explicit name-save, even with a name typed.
+        m.startNew()
+        m.name = "Home"
+        #expect(m.canSaveNameChange == false)
+
+        // Editing an existing provider.
+        m.populate(with: CustomProvider(name: "Office", ranges: ["10.0.0.0/8"]))
+        #expect(m.canSaveNameChange == false)   // unchanged
+        m.name = "Office HQ"
+        #expect(m.canSaveNameChange == true)    // changed
+        m.name = "   "
+        #expect(m.canSaveNameChange == false)   // empty
+        m.name = "Office"
+        #expect(m.canSaveNameChange == false)   // back to the saved name
+    }
+
     @Test func editingDraftPreservesID() {
         let existing = CustomProvider(name: "Office", ranges: ["10.0.0.0/8"])
         let m = CustomProviderEditorModel()

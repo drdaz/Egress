@@ -69,10 +69,14 @@ final class CustomProviderEditorModel: ObservableObject {
     /// The id of the provider being edited, or `nil` when creating a new one.
     private(set) var editingID: UUID?
 
+    /// The provider's name as last loaded/saved — used to detect an unsaved rename.
+    private(set) var savedName = ""
+
     /// Reset the editor for creating a brand-new provider.
     func startNew() {
         editingID = nil
         name = ""
+        savedName = ""
         ranges = []
         rangeInput = ""
         rangeInputError = nil
@@ -82,6 +86,7 @@ final class CustomProviderEditorModel: ObservableObject {
     func populate(with provider: CustomProvider) {
         editingID = provider.id
         name = provider.name
+        savedName = provider.name
         ranges = provider.ranges
         rangeInput = ""
         rangeInputError = nil
@@ -125,6 +130,15 @@ final class CustomProviderEditorModel: ObservableObject {
         !name.trimmingCharacters(in: .whitespaces).isEmpty && !ranges.isEmpty
     }
 
+    /// True when editing an existing provider whose (non-empty) name has changed
+    /// from the saved one — i.e. there's a rename worth saving explicitly.
+    var canSaveNameChange: Bool {
+        let trimmed = name.trimmingCharacters(in: .whitespaces)
+        return editingID != nil
+            && !trimmed.isEmpty
+            && trimmed != savedName.trimmingCharacters(in: .whitespaces)
+    }
+
     /// Build the provider value to persist. Preserves the id when editing.
     func makeDraft() -> CustomProvider {
         CustomProvider(
@@ -152,39 +166,61 @@ struct CustomProviderEditorView: View {
     }
 
     var body: some View {
-        Section("Custom Provider") {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Name")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextField("Name", text: $editor.name, prompt: Text("e.g. Home network"))
-                    .textFieldStyle(.roundedBorder)
-                    .labelsHidden()
-                Spacer()
-                Text("IPv4 address or CIDR range")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextField("Range", text: $editor.rangeInput, prompt: Text("e.g. 203.0.113.0/24"))
-                    .textFieldStyle(.roundedBorder)
-                    .labelsHidden()
-                    .onSubmit { editor.addRange() }
-                #if os(iOS)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                #endif
-                Spacer()
-                HStack {
-                    Spacer()
-                    Button("Add") { editor.addRange() }
-                        .disabled(editor.rangeInput.trimmingCharacters(in: .whitespaces).isEmpty)
+        Section {
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Name")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                    TextField("Name", text: $editor.name, prompt: Text("e.g. Home network"))
+                        .textFieldStyle(.roundedBorder)
+                        .labelsHidden()
+                        .onSubmit {
+                            // Save a rename on Return (ranges auto-save separately).
+                            if editor.canSaveNameChange { onSave(editor.makeDraft()) }
+                        }
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("IPv4 address or CIDR range")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                    TextField("Range", text: $editor.rangeInput, prompt: Text("e.g. 203.0.113.0/24"))
+                        .textFieldStyle(.roundedBorder)
+                        .labelsHidden()
+                        .onSubmit {
+                            editor.addRange()
+                            if editor.canSave { onSave(editor.makeDraft()) }
+                        }
+                    #if os(iOS)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                    #endif
+                    if let error = editor.rangeInputError {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    } else {
+                        Text("Press Return to add it to the list and save the provider.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                // Kept inside this VStack (not its own Form row) so there's no
+                // separator above it — macOS doesn't honor .listRowSeparator here.
+                if !editor.ranges.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Allowed IPs and ranges")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                        Text("If your public IP matches any of these, the app will show you as 'Connected'")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
-
-            if let error = editor.rangeInputError {
-                Text(error)
-                    .font(.caption)
-                    .foregroundStyle(.red)
-            }
+            .padding(.vertical, 6)
 
             // The ranges table appears once at least one valid range is added.
             // Removal: right-click (macOS) / long-press (iOS) → Remove; iOS also
@@ -192,40 +228,50 @@ struct CustomProviderEditorView: View {
             if !editor.ranges.isEmpty {
                 ForEach(editor.ranges, id: \.self) { range in
                     Text(range)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                         .contextMenu {
                             Button("Remove", role: .destructive) {
                                 editor.removeRange(range)
+                                persistRangeChange()
                             }
                         }
                 }
-                .onDelete { editor.removeRange(at: $0) }
-            }
-
-            // Remove is available whenever editing an existing provider; Save
-            // appears once there's at least one range.
-            if editor.editingID != nil || !editor.ranges.isEmpty {
-                HStack {
-                    if editor.editingID != nil {
-                        Button("Remove", role: .destructive) { showingRemoveConfirmation = true }
-                            .buttonStyle(.borderless)
-                            .confirmationDialog(
-                                removeConfirmationTitle,
-                                isPresented: $showingRemoveConfirmation,
-                                titleVisibility: .visible
-                            ) {
-                                Button("Remove", role: .destructive) { onRemove() }
-                                Button("Cancel", role: .cancel) {}
-                            }
-                    }
-                    Spacer()
-                    if !editor.ranges.isEmpty {
-                        Button("Save") { onSave(editor.makeDraft()) }
-                            .buttonStyle(.borderless)
-                            .disabled(!editor.canSave)
-                    }
+                .onDelete { offsets in
+                    editor.removeRange(at: offsets)
+                    persistRangeChange()
                 }
             }
+
+            // Remove is available whenever editing an existing provider.
+            if editor.editingID != nil {
+                HStack {
+                    Button("Remove", role: .destructive) { showingRemoveConfirmation = true }
+                        .buttonStyle(.borderless)
+                        .confirmationDialog(
+                            removeConfirmationTitle,
+                            isPresented: $showingRemoveConfirmation,
+                            titleVisibility: .visible
+                        ) {
+                            Button("Remove", role: .destructive) { onRemove() }
+                            Button("Cancel", role: .cancel) {}
+                        }
+                    Spacer()
+                }
+            }
+        } header: {
+            Text("Custom Provider")
+                .font(.title2)
+                .textCase(nil)
         }
+    }
+
+    /// Persist a range add/remove while editing an existing provider. Ranges
+    /// auto-save (only the name needs an explicit Save); skips when there's no
+    /// valid provider to save — e.g. the last range was just removed.
+    private func persistRangeChange() {
+        guard editor.editingID != nil, editor.canSave else { return }
+        onSave(editor.makeDraft())
     }
 }
 

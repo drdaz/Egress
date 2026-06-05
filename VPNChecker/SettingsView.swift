@@ -14,14 +14,44 @@ struct SettingsView: View {
         ConfigStore.load().providerChoiceItems
     }
 
+    #if os(macOS)
+    private let maxHeight: CGFloat = 800
+    @State private var contentHeight: CGFloat = 320
+    #endif
+
     var body: some View {
+        #if os(macOS)
+        // Hug content vertically (so the window resizes with the editor) but cap at
+        // maxHeight; beyond that the outer ScrollView scrolls instead of clipping.
+        ScrollView {
+            settingsForm
+                .formStyle(.grouped)
+                .frame(width: 380)
+                .fixedSize(horizontal: false, vertical: true)
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.size.height
+                } action: { height in
+                    contentHeight = height
+                }
+        }
+        .frame(width: 380, height: min(contentHeight, maxHeight))
+        #else
+        settingsForm
+        #endif
+    }
+
+    private var settingsForm: some View {
         Form {
-            Section("Provider") {
-                Picker("Provider", selection: $choice) {
+            Section() {
+                Picker("Location", selection: $choice) {
                     ForEach(choiceItems) { item in
                         Text(item.label).tag(item.choice)
                     }
                 }
+            } header: {
+                Text("Egress via")
+                    .font(.title2)
+                    .textCase(nil)
             }
 
             if mode != .hidden {
@@ -60,10 +90,6 @@ struct SettingsView: View {
             syncEditor(to: newChoice)
             // Note: selection is per-device and intentionally not pushed to iCloud.
         }
-        #if os(macOS)
-        .formStyle(.grouped)
-        .frame(width: 380, height: 320)
-        #endif
     }
 
     /// Configure the editor's contents to match the current choice (without
