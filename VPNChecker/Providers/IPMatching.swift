@@ -37,6 +37,17 @@ nonisolated struct IPv4Address: Equatable {
         }
         self.value = result
     }
+
+    /// Non-throwing convenience for callers that only care whether a string is a
+    /// valid IPv4 address (e.g. classifying an egress IP), not why it failed.
+    /// (A distinct label is required — Swift can't overload `init` on failability.)
+    init?(parsing string: String) {
+        do {
+            try self.init(string)
+        } catch {
+            return nil
+        }
+    }
 }
 
 /// A single allowlist rule: either an exact host or a CIDR network.
