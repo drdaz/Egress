@@ -85,13 +85,28 @@ struct IPCheckProviderTests {
         }
     }
 
-    @Test func throwsWhenResolvedIPIsUnparseable() async {
-        let provider = try! IPCheckProvider(
+    // An egress that isn't a parseable IPv4 address can't match the v4-only
+    // allowlist, so it degrades to "not connected" rather than throwing.
+    @Test func reportsNotConnectedWhenResolvedIPIsUnparseable() async throws {
+        let provider = try IPCheckProvider(
             rules: ["203.0.113.0/24"],
             resolver: StubResolver(result: .success(info("not-an-ip")))
         )
-        await #expect(throws: (any Error).self) {
-            _ = try await provider.checkStatus()
-        }
+        let status = try await provider.checkStatus()
+        #expect(status.isConnected == false)
+        #expect(status.ipAddress == "not-an-ip")   // IP is still surfaced
+        #expect(status.isConnected == false)
+        #expect(status.ipAddress == "not-an-ip")
+
+    // An IPv6 egress (e.g. on an IPv6-capable network) can't match a v4 allowlist.
+    // It must report "not connected" — no crash — and still surface the IP.
+    @Test func reportsNotConnectedForIPv6Egress() async throws {
+        let provider = try IPCheckProvider(
+            rules: ["203.0.113.0/24"],
+            resolver: StubResolver(result: .success(info("2001:db8::1")))
+        )
+        let status = try await provider.checkStatus()
+        #expect(status.isConnected == false)
+        #expect(status.ipAddress == "2001:db8::1")
     }
 }

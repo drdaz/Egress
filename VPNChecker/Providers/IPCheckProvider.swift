@@ -7,6 +7,9 @@
 //
 
 import Foundation
+import os
+
+private let log = Logger(subsystem: "dk.montnoir.Egress", category: "IPCheckProvider")
 
 /// Egress details for the current connection: the IP plus optional geo data
 /// (mirroring what the other providers surface for the UI).
@@ -42,7 +45,24 @@ nonisolated struct IPCheckProvider: VPNProvider {
 
     func checkStatus() async throws -> VPNStatus {
         let info = try await resolver.resolve()
-        let connected = matcher.contains(try IPv4Address(info.ipAddress))
+        // The allowlist is IPv4-only (v1). An egress that isn't a parseable IPv4
+        // address — most realistically an IPv6 egress — simply can't match, so we
+        // report "not connected" rather than throwing. The IP is still surfaced,
+        // so the UI shows e.g. the v6 address alongside a calm "Not connected".
+        // (Full IPv6 matching is deferred for v1. Note this also means an
+        // IPv4-mapped IPv6 egress like ::ffff:a.b.c.d won't match a v4 rule.)
+        let connected: Bool
+        if let address = IPv4Address(parsing: info.ipAddress) {
+            connected = matcher.contains(address)
+        } else {
+            // Two failure modes land here with the same user-facing result but
+            // different significance: a normal IPv6 egress (expected on dual-stack
+            // networks) vs. a genuinely malformed resolver response (e.g. an API
+            // change or an injected error page). Log at debug so the latter isn't
+            // completely silent; the IP is marked private to respect user privacy.
+            log.debug("Egress \(info.ipAddress, privacy: .private) is not a valid IPv4 address; reporting not connected")
+            connected = false
+        }
         return VPNStatus(
             isConnected: connected,
             ipAddress: info.ipAddress,
