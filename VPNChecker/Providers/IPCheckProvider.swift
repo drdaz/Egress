@@ -42,7 +42,17 @@ nonisolated struct IPCheckProvider: VPNProvider {
 
     func checkStatus() async throws -> VPNStatus {
         let info = try await resolver.resolve()
-        let connected = matcher.contains(try IPv4Address(info.ipAddress))
+        // The allowlist is IPv4-only (v1). An egress that isn't a parseable IPv4
+        // address — most realistically an IPv6 egress — simply can't match, so we
+        // report "not connected" rather than throwing. The IP is still surfaced,
+        // so the UI shows e.g. the v6 address alongside a calm "Not connected".
+        // (Full IPv6 matching is deferred; see the parked ClickUp task.)
+        let connected: Bool
+        if let address = try? IPv4Address(info.ipAddress) {
+            connected = matcher.contains(address)
+        } else {
+            connected = false
+        }
         return VPNStatus(
             isConnected: connected,
             ipAddress: info.ipAddress,
