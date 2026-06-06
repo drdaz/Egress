@@ -46,7 +46,7 @@ nonisolated struct IPCheckProvider: VPNProvider {
         // address — most realistically an IPv6 egress — simply can't match, so we
         // report "not connected" rather than throwing. The IP is still surfaced,
         // so the UI shows e.g. the v6 address alongside a calm "Not connected".
-        // (Full IPv6 matching is deferred; see the parked ClickUp task.)
+        // (Full IPv6 matching is deferred for v1.)
         let connected: Bool
         if let address = try? IPv4Address(info.ipAddress) {
             connected = matcher.contains(address)

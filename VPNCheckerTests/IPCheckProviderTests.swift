@@ -94,6 +94,7 @@ struct IPCheckProviderTests {
         )
         let status = try await provider.checkStatus()
         #expect(status.isConnected == false)
+        #expect(status.ipAddress == "not-an-ip")   // IP is still surfaced
     }
 
     // An IPv6 egress (e.g. on an IPv6-capable network) can't match a v4 allowlist.
