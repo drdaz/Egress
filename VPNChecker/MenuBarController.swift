@@ -40,8 +40,15 @@ class MenuBarController: NSObject {
 
         // Initial check, then poll so a status change made outside the app shows up.
         refresh()
-        timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { _ in
-            Task { @MainActor [weak self] in self?.refresh() }
+        // `[weak self]` sits on the outer (escaping) Timer closure: putting it on an
+        // inner Task instead would force the outer closure to capture self strongly
+        // (to hand to the weak binding), creating a self → timer → closure → self
+        // retain cycle. The timer is scheduled on (and fires on) the main run loop, so
+        // we hop to the main actor synchronously rather than via Task — that both
+        // satisfies refresh()'s isolation and avoids reading the captured `self` from
+        // concurrently-executing code.
+        timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.refresh() }
         }
     }
 
