@@ -2,13 +2,15 @@
 import AppKit
 import Combine
 import SwiftUI
-import WidgetKit
 
+@MainActor
 class MenuBarController: NSObject {
     private var statusItem: NSStatusItem?
-    private var checker = VPNStatusChecker()
+    // Shared with the main window so the menu bar and window can't show different
+    // statuses or run duplicate checks.
+    private let viewModel = ContentViewModel.shared
     private var timer: Timer?
-    private var cancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     func start() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -21,17 +23,26 @@ class MenuBarController: NSObject {
 
         setupMenu()
 
-        Task { await updateMenuBarIcon() }
+        // Re-render the icon/tooltip/menu whenever the shared check state changes —
+        // including the initial value, which paints the "Checking…" placeholder.
+        // `state` is @MainActor-mutated, so the publisher fires on the main actor and
+        // we can render synchronously (matching setupMenu's direct render call).
+        viewModel.$state
+            .sink { [weak self] state in self?.render(state) }
+            .store(in: &cancellables)
 
-        timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
-            Task { await self?.updateMenuBarIcon() }
-        }
-
-        cancellable = ProviderSelection.shared.$selection
+        // Re-check when the user switches providers, even while the window is closed.
+        // When it's open ContentView also refreshes; the newest check wins regardless.
+        ProviderSelection.shared.$selection
             .dropFirst()
-            .sink { [weak self] _ in
-                Task { await self?.updateMenuBarIcon() }
-            }
+            .sink { [weak self] _ in self?.refresh() }
+            .store(in: &cancellables)
+
+        // Initial check, then poll so a status change made outside the app shows up.
+        refresh()
+        timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { _ in
+            Task { @MainActor [weak self] in self?.refresh() }
+        }
     }
 
     @objc private func statusBarButtonClicked() {
@@ -68,16 +79,12 @@ class MenuBarController: NSObject {
 
         statusItem?.menu = menu
 
-        Task { await updateMenuStatus() }
+        // Paint the freshly built menu with the current state.
+        render(viewModel.state)
     }
 
     @objc private func refreshStatus() {
-        Task {
-            await checker.checkStatus()
-            await updateMenuStatus()
-            await updateMenuBarIcon()
-            WidgetCenter.shared.reloadAllTimelines()
-        }
+        refresh()
     }
 
     @objc private func openWindow() {
@@ -109,46 +116,42 @@ class MenuBarController: NSObject {
         window.isReleasedWhenClosed = false
     }
 
-    private func updateMenuBarIcon() async {
-        await checker.checkStatus()
-
-        let imageName: String
-        let tooltipText: String
-
-        if let status = checker.currentStatus {
-            imageName = status.isConnected ? "lock.shield.fill" : "lock.open.fill"
-            tooltipText = status.multilineDescription
-        } else if let error = checker.errorMessage {
-            imageName = "lock.shield"
-            tooltipText = "Error: \(error)"
-        } else {
-            imageName = "lock.shield"
-            tooltipText = "VPN Status"
-        }
-
-        await MainActor.run {
-            statusItem?.button?.image = NSImage(systemSymbolName: imageName, accessibilityDescription: "VPN Status")
-            statusItem?.button?.toolTip = tooltipText
-        }
-
-        await updateMenuStatus()
-        WidgetCenter.shared.reloadAllTimelines()
+    /// Kick off a shared check. `ContentViewModel.refresh()` already reloads the
+    /// widgets, so there's nothing extra to do here.
+    private func refresh() {
+        Task { await viewModel.refresh() }
     }
 
-    private func updateMenuStatus() async {
-        await MainActor.run {
-            guard let menu = statusItem?.menu else { return }
+    /// Map the shared check state onto the status item's icon/tooltip and the menu's
+    /// status line. `.loaded` shows the status, `.failed` the error, and
+    /// `.loading`/`.idle` the neutral "Checking…" placeholder.
+    private func render(_ state: VPNCheckState) {
+        let imageName: String
+        let tooltip: String
+        let menuTitle: String
 
-            if let statusItem = menu.items.first(where: { $0.tag == 999 }) {
-                if let status = checker.currentStatus {
-                    let icon = status.isConnected ? "✅" : "❌"
-                    statusItem.title = "\(icon) \(status.singleLineDescription)"
-                } else if let error = checker.errorMessage {
-                    statusItem.title = "⚠️ \(error)"
-                } else {
-                    statusItem.title = "Checking..."
-                }
-            }
+        switch state {
+        case .loaded(let status):
+            imageName = status.isConnected ? "lock.shield.fill" : "lock.open.fill"
+            tooltip = status.multilineDescription
+            let icon = status.isConnected ? "✅" : "❌"
+            menuTitle = "\(icon) \(status.singleLineDescription)"
+        case .failed(let message):
+            imageName = "lock.shield"
+            tooltip = "Error: \(message)"
+            menuTitle = "⚠️ \(message)"
+        case .loading, .idle:
+            imageName = "lock.shield"
+            tooltip = "VPN Status"
+            menuTitle = "Checking..."
+        }
+
+        statusItem?.button?.image = NSImage(systemSymbolName: imageName, accessibilityDescription: "VPN Status")
+        statusItem?.button?.toolTip = tooltip
+
+        if let menu = statusItem?.menu,
+           let statusMenuItem = menu.items.first(where: { $0.tag == 999 }) {
+            statusMenuItem.title = menuTitle
         }
     }
 }

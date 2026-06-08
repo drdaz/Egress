@@ -26,6 +26,11 @@ nonisolated enum VPNCheckState: Equatable {
 
 @MainActor
 final class ContentViewModel: ObservableObject {
+    /// The app-wide view model. The main window and the macOS menu bar both read
+    /// this one instance so they can't show divergent statuses or run duplicate
+    /// checks. Tests construct their own instances with injected doubles instead.
+    static let shared = ContentViewModel()
+
     @Published private(set) var state: VPNCheckState = .idle
     @Published private(set) var lastChecked: Date?
 
@@ -87,9 +92,20 @@ final class ContentViewModel: ObservableObject {
         reloadWidgets()
     }
 
-    /// First appearance: begin iCloud sync, then run an initial check.
+    /// Whether `startSync()` has already run. Now that `ContentView` observes the
+    /// shared view model, its `.task { start() }` fires again for every window that
+    /// gets created (e.g. the menu bar's "Open"). iCloud sync is a one-time setup, so
+    /// gate it — later appearances just re-check. `CloudConfigSync.start()` is
+    /// idempotent today, but making the intent explicit guards against that changing.
+    private var syncStarted = false
+
+    /// First appearance: begin iCloud sync, then run an initial check. Subsequent
+    /// appearances skip the sync setup and just refresh.
     func start() async {
-        startSync()
+        if !syncStarted {
+            syncStarted = true
+            startSync()
+        }
         await refresh()
     }
 

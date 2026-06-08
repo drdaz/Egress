@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var viewModel = ContentViewModel()
+    // Shared with the macOS menu bar (see ContentViewModel.shared) so the two can't
+    // diverge. Observed rather than @StateObject-owned: its lifetime is the app's.
+    @ObservedObject private var viewModel = ContentViewModel.shared
     @ObservedObject private var providerSelection = ProviderSelection.shared
     @State private var showingSettings = false
     @State private var showingOnboarding: Bool
