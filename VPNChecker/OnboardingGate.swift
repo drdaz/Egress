@@ -36,6 +36,6 @@ nonisolated struct OnboardingGate {
 
     /// Record onboarding as complete so it is not shown again on this device.
     func markComplete() {
-        try? Data().write(to: markerURL, options: .atomic)
+        try! Data().write(to: markerURL, options: .atomic)
     }
 }
