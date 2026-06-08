@@ -52,7 +52,9 @@ final class ContentViewModel: ObservableObject {
     }
 
     /// Production check: resolve the selected provider and query its egress status.
-    static let defaultCheck: @MainActor () async -> Result<VPNStatus, Error> = {
+    /// `nonisolated` so it can be used as the init's default argument (evaluated in
+    /// a nonisolated context); the body only touches the nonisolated checker.
+    nonisolated static let defaultCheck: @MainActor () async -> Result<VPNStatus, Error> = {
         do { return .success(try await VPNStatusChecker.checkStatus()) }
         catch { return .failure(error) }
     }
