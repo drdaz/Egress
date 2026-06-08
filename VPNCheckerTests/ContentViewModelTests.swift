@@ -114,6 +114,7 @@ struct ContentViewModelTests {
 
         async let firstCall: Void = viewModel.refresh()
         while gate == nil { await Task.yield() }   // let the slow call park
+        #expect(viewModel.state == .loading)       // state is .loading while a check is in flight
         await viewModel.refresh()                  // newer call wins
         #expect(viewModel.state == .loaded(fast))
 

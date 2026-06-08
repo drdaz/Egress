@@ -38,7 +38,13 @@ final class ContentViewModel: ObservableObject {
     /// - Parameters are injectable so tests can substitute the network check, the
     ///   clock, widget reloads, and iCloud sync. Defaults wire up the real services.
     init(
-        runCheck: @escaping @MainActor () async -> Result<VPNStatus, Error> = ContentViewModel.defaultCheck,
+        // Default: resolve the selected provider and query its egress status. Only
+        // touches the nonisolated checker, so forming this @MainActor closure in the
+        // (nonisolated) default-argument context is fine.
+        runCheck: @escaping @MainActor () async -> Result<VPNStatus, Error> = {
+            do { return .success(try await VPNStatusChecker.checkStatus()) }
+            catch { return .failure(error) }
+        },
         now: @escaping @MainActor () -> Date = { Date() },
         reloadWidgets: @escaping @MainActor () -> Void = { WidgetCenter.shared.reloadAllTimelines() },
         startSync: @escaping @MainActor () -> Void = { CloudConfigSync.shared.start() },
@@ -49,14 +55,6 @@ final class ContentViewModel: ObservableObject {
         self.reloadWidgets = reloadWidgets
         self.startSync = startSync
         self.reconcileCloud = reconcileCloud
-    }
-
-    /// Production check: resolve the selected provider and query its egress status.
-    /// `nonisolated` so it can be used as the init's default argument (evaluated in
-    /// a nonisolated context); the body only touches the nonisolated checker.
-    nonisolated static let defaultCheck: @MainActor () async -> Result<VPNStatus, Error> = {
-        do { return .success(try await VPNStatusChecker.checkStatus()) }
-        catch { return .failure(error) }
     }
 
     /// Distinguishes overlapping `refresh()` calls. `refresh()` is `async`, so the
@@ -83,6 +81,8 @@ final class ContentViewModel: ObservableObject {
         case .success(let status): state = .loaded(status)
         case .failure(let error): state = .failed(error.localizedDescription)
         }
+        // Stamped/reloaded on both success and failure: we record every completed
+        // attempt, and the widget reload is harmless (the extension runs its own check).
         lastChecked = now()
         reloadWidgets()
     }
