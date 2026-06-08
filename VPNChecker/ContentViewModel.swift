@@ -57,10 +57,27 @@ final class ContentViewModel: ObservableObject {
         catch { return .failure(error) }
     }
 
+    /// Distinguishes overlapping `refresh()` calls. `refresh()` is `async`, so the
+    /// main actor yields at the network `await` and a second call (e.g. the user
+    /// switching providers mid-check) can start before the first returns. Without
+    /// this guard, whichever check finishes *last* wins — a slow response for the
+    /// previous provider could clobber a fast response for the new one. Tagging each
+    /// call and discarding stale results lets the newest call win regardless of
+    /// network order, without needing cooperative cancellation (which the underlying
+    /// check doesn't support).
+    private var checkGeneration = 0
+
     /// Run a status check, record when it finished, and refresh the widgets.
+    /// Results from a superseded call are dropped.
     func refresh() async {
+        checkGeneration += 1
+        let generation = checkGeneration
         state = .loading
-        switch await runCheck() {
+
+        let result = await runCheck()
+        guard generation == checkGeneration else { return }
+
+        switch result {
         case .success(let status): state = .loaded(status)
         case .failure(let error): state = .failed(error.localizedDescription)
         }
