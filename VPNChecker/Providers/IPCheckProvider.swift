@@ -9,7 +9,7 @@
 import Foundation
 import os
 
-private let log = Logger(subsystem: "dk.montnoir.Egress", category: "IPCheckProvider")
+private nonisolated let log = Logger(subsystem: "dk.montnoir.Egress", category: "IPCheckProvider")
 
 /// Egress details for the current connection: the IP plus optional geo data
 /// (mirroring what the other providers surface for the UI).
