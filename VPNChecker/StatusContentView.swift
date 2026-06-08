@@ -30,7 +30,8 @@ struct StatusContentView: View {
             StatusMessageView(
                 systemImage: "network",
                 tint: .gray,
-                title: "Check your \(providerName) status"
+                title: "Check your \(providerName) status",
+                message: nil
             )
         }
     }
@@ -42,7 +43,7 @@ struct StatusMessageView: View {
     let systemImage: String
     let tint: Color
     let title: String
-    var message: String?
+    let message: String?
 
     var body: some View {
         VStack(spacing: 12) {
