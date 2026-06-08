@@ -9,7 +9,7 @@ import Foundation
 /// iCloud-synced config, so a new device shows the onboarding on its first
 /// launch. Completion is recorded by the marker file's *existence*; its contents
 /// are unused.
-struct OnboardingGate {
+nonisolated struct OnboardingGate {
     private static let markerFileName = "onboarding-complete"
 
     private let directory: URL

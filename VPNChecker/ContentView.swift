@@ -13,10 +13,19 @@ struct ContentView: View {
     @ObservedObject private var providerSelection = ProviderSelection.shared
     @State private var lastChecked: Date?
     @State private var showingSettings = false
-    @State private var showingOnboarding = false
+    @State private var showingOnboarding: Bool
     @Environment(\.scenePhase) private var scenePhase
 
-    private let onboardingGate = OnboardingGate()
+    private let onboardingGate: OnboardingGate
+
+    init() {
+        // Construct the gate once (each `OnboardingGate()` resolves the container
+        // dir) and seed the sheet state before first render, so a first-launch
+        // user doesn't briefly see the main content before onboarding appears.
+        let gate = OnboardingGate()
+        onboardingGate = gate
+        _showingOnboarding = State(initialValue: gate.shouldShowOnboarding)
+    }
 
     var body: some View {
         NavigationStack {
@@ -76,7 +85,6 @@ struct ContentView: View {
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .task {
-                showingOnboarding = onboardingGate.shouldShowOnboarding
                 CloudConfigSync.shared.start()
                 await checker.checkStatus()
                 lastChecked = Date()
