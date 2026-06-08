@@ -13,7 +13,10 @@ struct ContentView: View {
     @ObservedObject private var providerSelection = ProviderSelection.shared
     @State private var lastChecked: Date?
     @State private var showingSettings = false
+    @State private var showingOnboarding = false
     @Environment(\.scenePhase) private var scenePhase
+
+    private let onboardingGate = OnboardingGate()
 
     var body: some View {
         NavigationStack {
@@ -69,11 +72,11 @@ struct ContentView: View {
             }
             .padding()
             .navigationTitle("Egress")
-            .navigationSubtitle("VPN Checker")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .task {
+                showingOnboarding = onboardingGate.shouldShowOnboarding
                 CloudConfigSync.shared.start()
                 await checker.checkStatus()
                 lastChecked = Date()
@@ -120,6 +123,15 @@ struct ContentView: View {
                 }
             }
             #endif
+        }
+        // First-launch onboarding, presented over the main view on both platforms.
+        // Attached at the NavigationStack level (a different tree position than the
+        // iOS settings sheet above) so the two sheets don't conflict.
+        .sheet(isPresented: $showingOnboarding) {
+            OnboardingView {
+                onboardingGate.markComplete()
+                showingOnboarding = false
+            }
         }
     }
 }

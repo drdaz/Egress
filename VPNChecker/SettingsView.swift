@@ -10,6 +10,15 @@ struct SettingsView: View {
     @State private var choice: ProviderChoice = .selection(ProviderSelection.shared.selection)
     @State private var mode: ProviderEditorMode = .hidden
 
+    /// Optional content rendered as the Form's first section. Onboarding passes
+    /// its intro here so it shares the Form's grouped background and spacing; the
+    /// macOS Settings scene and the iOS settings sheet leave it nil.
+    private let header: AnyView?
+
+    init(header: AnyView? = nil) {
+        self.header = header
+    }
+
     private var choiceItems: [ProviderChoiceItem] {
         ConfigStore.load().providerChoiceItems
     }
@@ -42,6 +51,10 @@ struct SettingsView: View {
 
     private var settingsForm: some View {
         Form {
+            if let header {
+                Section { header }
+            }
+
             Section() {
                 Picker("Location", selection: $choice) {
                     ForEach(choiceItems) { item in
@@ -82,7 +95,22 @@ struct SettingsView: View {
                 )
             }
         }
-        .onAppear { syncEditor(to: choice) }
+        .onAppear {
+            // `choice` is seeded once, at view init. On macOS the Settings scene
+            // is built at app launch, so a selection made afterwards (e.g. during
+            // onboarding) leaves `choice` stale when Settings is later opened.
+            // Reconcile from the source of truth here. Computed locally so the
+            // syncEditor call uses the resolved value regardless of @State
+            // propagation timing; guarded so an in-progress "Add Custom" isn't
+            // clobbered.
+            var current = choice
+            if case .selection(let selected) = current,
+               selected != providerSelection.selection {
+                current = .selection(providerSelection.selection)
+                choice = current
+            }
+            syncEditor(to: current)
+        }
         .onChange(of: choice) { _, newChoice in
             if case .selection(let selection) = newChoice {
                 providerSelection.select(selection)
