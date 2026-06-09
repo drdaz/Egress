@@ -123,7 +123,7 @@ extension CustomProvider {
     /// provider's ranges. Mirrors `VPNProviderType.makeProvider()`.
     /// - Parameter resolver: egress resolver (injected so tests can avoid the network).
     /// - Throws: if `ranges` contains a malformed IP/CIDR entry.
-    func makeProvider(resolver: CurrentIPResolver = NetworkIPResolver()) throws -> VPNProvider {
+    nonisolated func makeProvider(resolver: CurrentIPResolver = NetworkIPResolver()) throws -> VPNProvider {
         try IPCheckProvider(name: name, rules: ranges, resolver: resolver)
     }
 }

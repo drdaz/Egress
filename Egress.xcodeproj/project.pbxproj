@@ -80,6 +80,8 @@
 				Providers/MullvadProvider.swift,
 				Providers/NetworkIPResolver.swift,
 				Providers/VPNProvider.swift,
+				AppConfig.swift,
+				ConfigStore.swift,
 				VPNStatusChecker.swift,
 			);
 			target = BC1DF2C12F66FDF800A191B9 /* EgressWidgetExtensionExtension */;
