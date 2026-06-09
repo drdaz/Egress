@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import os
 
 /// Persisted app configuration written as JSON in the shared App Group container.
 nonisolated struct AppConfig: Codable, Equatable {
