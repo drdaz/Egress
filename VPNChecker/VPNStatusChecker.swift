@@ -6,8 +6,6 @@
 //
 
 import Foundation
-import os
-import Combine
 
 /// Persisted app configuration written as JSON in the shared App Group container.
 nonisolated struct AppConfig: Codable, Equatable {
@@ -185,32 +183,18 @@ nonisolated enum ConfigStore {
     }
 }
 
-/// Service class for checking VPN status
-class VPNStatusChecker: ObservableObject {
-    @Published var currentStatus: VPNStatus?
-    @Published var isLoading = false
-    @Published var errorMessage: String?
-
-    func checkStatus() async {
-        await MainActor.run {
-            isLoading = true
-            errorMessage = nil
-        }
-
-        let config = ConfigStore.load()
-
-        do {
-            let provider = try config.makeSelectedProvider()
-            let status = try await provider.checkStatus()
-            await MainActor.run { currentStatus = status }
-        } catch {
-            await MainActor.run { errorMessage = error.localizedDescription }
-        }
-
-        await MainActor.run { isLoading = false }
-    }
-
-    /// Static method for use in widgets (which can't use @MainActor easily)
+/// Namespace for checking VPN status. The selection/egress logic lives in
+/// `AppConfig.makeSelectedProvider()` and `VPNProvider`; this is just the entry
+/// point the app, App Intents, and the widget share.
+///
+/// Deliberately left without an explicit actor annotation: this file is compiled
+/// into both the app (default `@MainActor` isolation) and the widget extension
+/// (no default isolation), and `makeSelectedProvider()` — also in this file —
+/// tracks the same per-target default. Pinning an explicit isolation here would
+/// desync the two in the app target.
+enum VPNStatusChecker {
+    /// Checks the current VPN status using the given provider, or the configured
+    /// selection when none is supplied.
     static func checkStatus(using provider: VPNProvider? = nil) async throws -> VPNStatus {
         let config = ConfigStore.load()
         let actualProvider = try provider ?? config.makeSelectedProvider()
