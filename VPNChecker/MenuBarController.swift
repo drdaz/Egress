@@ -23,11 +23,13 @@ class MenuBarController: NSObject {
 
         setupMenu()
 
-        // Re-render the icon/tooltip/menu whenever the shared check state changes —
-        // including the initial value, which paints the "Checking…" placeholder.
-        // `state` is @MainActor-mutated, so the publisher fires on the main actor and
-        // we can render synchronously (matching setupMenu's direct render call).
+        // Re-render the icon/tooltip/menu on every subsequent state change. `state` is
+        // @MainActor-mutated, so the publisher fires on the main actor and we can
+        // render synchronously (matching setupMenu's direct render call). `.dropFirst()`
+        // skips the immediate replay of the current value — setupMenu() above already
+        // painted it, so the subscription owns only the changes after that.
         viewModel.$state
+            .dropFirst()
             .sink { [weak self] state in self?.render(state) }
             .store(in: &cancellables)
 
@@ -50,6 +52,13 @@ class MenuBarController: NSObject {
         timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.refresh() }
         }
+    }
+
+    deinit {
+        // A scheduled repeating timer is retained by the run loop, not by us, so it
+        // keeps firing after deinit unless explicitly invalidated. (`cancellables`
+        // cancels itself on dealloc, so the Combine subscriptions need no cleanup.)
+        timer?.invalidate()
     }
 
     @objc private func statusBarButtonClicked() {
