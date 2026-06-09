@@ -94,6 +94,25 @@ struct ContentViewModelTests {
         #expect(callOrder == ["sync", "check"])
     }
 
+    @Test func repeatedStartSyncsOnceButRefreshesEachTime() async {
+        // The shared view model can have start() called once per created window
+        // (ContentView.task). iCloud sync should be set up only once; every
+        // appearance should still refresh.
+        var syncCount = 0
+        var checkCount = 0
+        let viewModel = makeViewModel(
+            runCheck: { checkCount += 1; return .success(Self.sampleStatus) },
+            startSync: { syncCount += 1 }
+        )
+
+        await viewModel.start()
+        await viewModel.start()
+        await viewModel.start()
+
+        #expect(syncCount == 1)
+        #expect(checkCount == 3)
+    }
+
     @Test func staleCheckDoesNotOverwriteNewerResult() async {
         let slow = Self.makeStatus(ip: "9.9.9.9")
         let fast = Self.makeStatus(ip: "1.1.1.1")
