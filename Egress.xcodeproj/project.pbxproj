@@ -73,6 +73,8 @@
 		BC1DF2D92F66FE2F00A191B9 /* Exceptions for "VPNChecker" folder in "EgressWidgetExtensionExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				AppConfig.swift,
+				Main/ConfigStore.swift,
 				Providers/AirVPNProvider.swift,
 				Providers/IPCheckProvider.swift,
 				Providers/IPMatching.swift,
