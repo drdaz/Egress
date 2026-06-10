@@ -276,6 +276,7 @@ struct CustomProviderEditorView: View {
             Text(sectionTitle)
                 .font(.title2)
                 .textCase(nil)
+                .foregroundStyle(.primary)
         }
     }
 

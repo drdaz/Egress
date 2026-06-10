@@ -66,6 +66,7 @@ struct SettingsView: View {
                 Text("Egress via")
                     .font(.title2)
                     .textCase(nil)
+                    .foregroundStyle(.primary)
             } footer: {
                 Text("Choose the VPN, network, or location you expect to be using.")
             }
