@@ -67,7 +67,7 @@ struct SettingsView: View {
                     .font(.title2)
                     .textCase(nil)
             } footer: {
-                Text("The VPN, network, or location you expect to be using. Egress confirms your public IP matches.")
+                Text("Choose the VPN, network, or location you expect to be using.")
             }
 
             if mode != .hidden {
