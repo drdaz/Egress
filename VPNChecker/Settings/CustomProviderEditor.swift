@@ -162,16 +162,21 @@ struct CustomProviderEditorView: View {
 
     private var removeConfirmationTitle: String {
         let name = editor.name.trimmingCharacters(in: .whitespaces)
-        return name.isEmpty ? "Remove this provider?" : "Remove “\(name)”?"
+        return name.isEmpty ? "Remove this egress?" : "Remove “\(name)”?"
     }
 
     var body: some View {
         Section {
             VStack(alignment: .leading, spacing: 16) {
+                Text("Define your own egress point — a VPN, a home or office network, a specific location. Add the public IPs it uses and Egress confirms when your traffic is exiting there.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Name")
                         .font(.title3)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.primary)
                     TextField("Name", text: $editor.name, prompt: Text("e.g. Home network"))
                         .textFieldStyle(.roundedBorder)
                         .labelsHidden()
@@ -184,7 +189,7 @@ struct CustomProviderEditorView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("IPv4 address or CIDR range")
                         .font(.title3)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.primary)
                     TextField("Range", text: $editor.rangeInput, prompt: Text("e.g. 203.0.113.0/24"))
                         .textFieldStyle(.roundedBorder)
                         .labelsHidden()
@@ -201,7 +206,7 @@ struct CustomProviderEditorView: View {
                             .font(.caption)
                             .foregroundStyle(.red)
                     } else {
-                        Text("Press Return to add it to the list and save the provider.")
+                        Text("Press Return to add it to the list and save this egress.")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -213,7 +218,7 @@ struct CustomProviderEditorView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Allowed IPs and ranges")
                             .font(.title3)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.primary)
                         Text("If your public IP matches any of these, the app will show you as 'Connected'")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
@@ -260,7 +265,7 @@ struct CustomProviderEditorView: View {
                 }
             }
         } header: {
-            Text("Custom Provider")
+            Text("Custom Egress")
                 .font(.title2)
                 .textCase(nil)
         }

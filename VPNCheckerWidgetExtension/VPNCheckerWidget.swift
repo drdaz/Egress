@@ -17,7 +17,7 @@ struct VPNCheckerWidget: Widget {
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("Egress")
-        .description("Check if you're connected to your VPN")
+        .description("Check at a glance that you're reaching the internet from where you expect.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

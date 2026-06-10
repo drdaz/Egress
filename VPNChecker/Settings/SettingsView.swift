@@ -55,12 +55,13 @@ struct SettingsView: View {
                 Section { header }
             }
 
-            Section() {
-                Picker("Location", selection: $choice) {
+            Section {
+                Picker("", selection: $choice) {
                     ForEach(choiceItems) { item in
                         Text(item.label).tag(item.choice)
                     }
                 }
+                .accessibilityLabel("Egress via")
             } header: {
                 Text("Egress via")
                     .font(.title2)
