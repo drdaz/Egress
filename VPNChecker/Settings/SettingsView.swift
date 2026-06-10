@@ -55,16 +55,19 @@ struct SettingsView: View {
                 Section { header }
             }
 
-            Section() {
-                Picker("Location", selection: $choice) {
+            Section {
+                Picker("", selection: $choice) {
                     ForEach(choiceItems) { item in
                         Text(item.label).tag(item.choice)
                     }
                 }
+                .accessibilityLabel("Egress via")
             } header: {
                 Text("Egress via")
                     .font(.title2)
                     .textCase(nil)
+            } footer: {
+                Text("Choose the VPN, network, or location you expect to be using.")
             }
 
             if mode != .hidden {

@@ -79,7 +79,7 @@ struct VPNStatusView: View {
                 .multilineTextAlignment(.center)
 
             VStack(alignment: .leading, spacing: 12) {
-                InfoRow(label: "Provider", value: selectedProviderName)
+                InfoRow(label: "Egress", value: selectedProviderName)
 
                 InfoRow(label: "IP Address", value: status.ipAddress)
 

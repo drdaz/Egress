@@ -16,7 +16,7 @@ class MenuBarController: NSObject {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem?.button {
-            button.image = NSImage(systemSymbolName: "lock.shield", accessibilityDescription: "VPN Status")
+            button.image = NSImage(systemSymbolName: "lock.shield", accessibilityDescription: "Egress")
             button.action = #selector(statusBarButtonClicked)
             button.target = self
         }
@@ -158,11 +158,11 @@ class MenuBarController: NSObject {
             menuTitle = "⚠️ \(message)"
         case .loading, .idle:
             imageName = "lock.shield"
-            tooltip = "VPN Status"
+            tooltip = "Egress"
             menuTitle = "Checking..."
         }
 
-        statusItem?.button?.image = NSImage(systemSymbolName: imageName, accessibilityDescription: "VPN Status")
+        statusItem?.button?.image = NSImage(systemSymbolName: imageName, accessibilityDescription: "Egress")
         statusItem?.button?.toolTip = tooltip
 
         if let menu = statusItem?.menu,
