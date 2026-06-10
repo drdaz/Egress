@@ -162,7 +162,7 @@ struct CustomProviderEditorView: View {
 
     private var removeConfirmationTitle: String {
         let name = editor.name.trimmingCharacters(in: .whitespaces)
-        return name.isEmpty ? "Remove this egress?" : "Remove “\(name)”?"
+        return name.isEmpty ? "Remove this egress point?" : "Remove “\(name)”?"
     }
 
     var body: some View {
@@ -206,7 +206,7 @@ struct CustomProviderEditorView: View {
                             .font(.caption)
                             .foregroundStyle(.red)
                     } else {
-                        Text("Press Return to add it to the list and save this egress.")
+                        Text("Press Return to add it to the list and save this egress point.")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }

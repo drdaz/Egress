@@ -36,12 +36,12 @@ struct OnboardingView: View {
 
     private var intro: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Egress")
+            Text("Welcome to Egress")
                 .font(.title2)
                 .fontWeight(.bold)
-            Text("Know where you're surfacing from — at a glance. Egress checks that your traffic is exiting to the internet where you expect, right from a widget.")
+            Text("Know where you're surfacing from - at a glance. Egress checks that your traffic is exiting to the internet where you expect, right from a widget.")
                 .foregroundStyle(.secondary)
-            Text("Pick a provider below, or add a custom egress check for anything that's not listed. Change it any time in Settings.")
+            Text("Pick a VPN provider below, or add a custom egress check for anything that's not listed. Change it any time in Settings.")
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
