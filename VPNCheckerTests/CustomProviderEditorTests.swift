@@ -164,6 +164,17 @@ struct CustomProviderEditorModelTests {
         #expect(m.canSaveNameChange == false)   // back to the saved name
     }
 
+    @Test func savedNameTracksLoadAndClear() {
+        let m = CustomProviderEditorModel()
+        #expect(m.savedName == "")              // fresh: no saved name → plain "Custom Egress"
+
+        m.populate(with: CustomProvider(name: "Work", ranges: ["1.2.3.4"]))
+        #expect(m.savedName == "Work")          // loaded/saved → "Custom Egress: Work"
+
+        m.startNew()
+        #expect(m.savedName == "")              // back to creating → plain "Custom Egress"
+    }
+
     @Test func editingDraftPreservesID() {
         let existing = CustomProvider(name: "Office", ranges: ["10.0.0.0/8"])
         let m = CustomProviderEditorModel()
