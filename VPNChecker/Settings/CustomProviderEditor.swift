@@ -69,8 +69,10 @@ final class CustomProviderEditorModel: ObservableObject {
     /// The id of the provider being edited, or `nil` when creating a new one.
     private(set) var editingID: UUID?
 
-    /// The provider's name as last loaded/saved — used to detect an unsaved rename.
-    private(set) var savedName = ""
+    /// The provider's name as last loaded/saved — used to detect an unsaved rename
+    /// and to title the editor section. Published so the section header updates
+    /// when a provider is loaded or first saved.
+    @Published private(set) var savedName = ""
 
     /// Reset the editor for creating a brand-new provider.
     func startNew() {
@@ -163,6 +165,12 @@ struct CustomProviderEditorView: View {
     private var removeConfirmationTitle: String {
         let name = editor.name.trimmingCharacters(in: .whitespaces)
         return name.isEmpty ? "Remove this egress point?" : "Remove “\(name)”?"
+    }
+
+    /// "Custom Egress" while creating a not-yet-saved entry; "Custom Egress: Work"
+    /// once a named provider is loaded or first saved.
+    private var sectionTitle: String {
+        editor.savedName.isEmpty ? "Custom Egress" : "Custom Egress: \(editor.savedName)"
     }
 
     var body: some View {
@@ -265,7 +273,7 @@ struct CustomProviderEditorView: View {
                 }
             }
         } header: {
-            Text("Custom Egress")
+            Text(sectionTitle)
                 .font(.title2)
                 .textCase(nil)
         }
