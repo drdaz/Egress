@@ -66,7 +66,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				TROUBLESHOOTING.md,
 			);
 			target = BC1DF2C12F66FDF800A191B9 /* EgressWidgetExtensionExtension */;
 		};
@@ -89,11 +88,7 @@
 		BC5C070F2FCE18BD004E8C1E /* Exceptions for "VPNChecker" folder in "Egress" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				ARCHITECTURE.md,
-				MENUBAR_SETUP.md,
 				README.md,
-				SETUP.md,
-				WIDGET_UPDATE_FIX.md,
 			);
 			target = BC1DF27F2F65CC8900A191B9 /* Egress */;
 		};
