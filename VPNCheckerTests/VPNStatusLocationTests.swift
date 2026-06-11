@@ -37,6 +37,14 @@ struct VPNStatusLocationTests {
         #expect(status(city: "   ", country: "Netherlands").locationDescription == "Netherlands")
     }
 
+    @Test func dropsEmptyCountry() {
+        #expect(status(city: "Amsterdam", country: "").locationDescription == "Amsterdam")
+    }
+
+    @Test func dropsWhitespaceOnlyCountry() {
+        #expect(status(city: "Amsterdam", country: "   ").locationDescription == "Amsterdam")
+    }
+
     @Test func usesCountryWhenCityNil() {
         #expect(status(city: nil, country: "Sweden").locationDescription == "Sweden")
     }
