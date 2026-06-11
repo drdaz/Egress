@@ -195,10 +195,17 @@ struct HTTPStubbedTests {
             #expect(status.country == nil)
         }
 
+        /// A non-"ok" result is a business-logic failure, not a parse failure, so
+        /// it must surface as .invalidResponse — never re-wrapped as .decodingError.
+        /// (VPNProviderError isn't Equatable, so match the case explicitly.)
         @Test func throwsWhenResultNotOk() async {
             StubURLProtocol.handler = respond(200, #"{"ip":"1.2.3.4","airvpn":false,"geo":null,"result":"error"}"#)
-            await #expect(throws: VPNProviderError.self) {
+            let thrown = await #expect(throws: VPNProviderError.self) {
                 _ = try await AirVPNProvider(session: makeStubbedSession()).checkStatus()
+            }
+            guard case .invalidResponse? = thrown else {
+                Issue.record("expected .invalidResponse, got \(String(describing: thrown))")
+                return
             }
         }
     }
