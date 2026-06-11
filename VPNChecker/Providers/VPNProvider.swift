@@ -19,12 +19,13 @@ nonisolated struct VPNStatus: Codable, Equatable {
     let serverName: String?
     
     /// "City, Country" from whichever of the two are present and non-blank,
-    /// or just the one that is; nil when neither has a usable value. Guards
-    /// against APIs that return an empty string (e.g. IVPN's `"city":""`),
-    /// which would otherwise render as a dangling ", Country".
+    /// or just the one that is (e.g. a city with no country resolves to the
+    /// city alone); nil when neither has a usable value. Guards against APIs
+    /// that return an empty string (e.g. IVPN's `"city":""`), which would
+    /// otherwise render as a dangling ", Country".
     private var cityCountry: String? {
         let parts = [city, country]
-            .compactMap { $0?.trimmingCharacters(in: .whitespaces) }
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
         return parts.isEmpty ? nil : parts.joined(separator: ", ")
     }

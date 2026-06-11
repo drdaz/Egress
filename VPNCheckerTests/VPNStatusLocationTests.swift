@@ -41,6 +41,14 @@ struct VPNStatusLocationTests {
         #expect(status(city: nil, country: "Sweden").locationDescription == "Sweden")
     }
 
+    /// A non-blank city with no country is surfaced on its own. This is a
+    /// deliberate change from the old behaviour (which fell through to
+    /// serverLocation / "Unknown" unless *both* fields were present) —
+    /// showing the city we have beats showing "Unknown".
+    @Test func usesCityAloneWhenCountryNil() {
+        #expect(status(city: "Amsterdam", country: nil).locationDescription == "Amsterdam")
+    }
+
     @Test func fallsBackToServerLocationWhenNoGeo() {
         #expect(status(city: "", country: nil, serverLocation: "WireGuard").locationDescription == "WireGuard")
     }
