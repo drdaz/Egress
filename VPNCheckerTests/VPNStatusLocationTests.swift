@@ -70,4 +70,11 @@ struct VPNStatusLocationTests {
         #expect(lines.contains("Netherlands"))
         #expect(!lines.contains(", Netherlands"))
     }
+
+    /// The city-alone change applies to multilineDescription too: a non-blank
+    /// city with no country is appended where it was previously dropped.
+    @Test func multilineUsesCityAloneWhenCountryNil() {
+        let lines = status(city: "Amsterdam", country: nil).multilineDescription
+        #expect(lines.contains("Amsterdam"))
+    }
 }
