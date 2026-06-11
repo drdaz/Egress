@@ -12,9 +12,14 @@ nonisolated struct MullvadProvider: VPNProvider {
     let providerName = "Mullvad"
     
     private let apiURL = URL(string: "https://am.i.mullvad.net/json")!
-    
+    private let session: URLSession
+
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
+
     func checkStatus() async throws -> VPNStatus {
-        let (data, response) = try await URLSession.shared.data(from: apiURL)
+        let (data, response) = try await session.data(from: apiURL)
         
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
@@ -43,9 +48,9 @@ nonisolated struct MullvadProvider: VPNProvider {
 
 private nonisolated struct MullvadResponse: Codable {
     let ip: String
-    let country: String
-    let city: String
-    let organization: String
+    let country: String?
+    let city: String?
+    let organization: String?
     let mullvadExitIP: Bool
     let mullvadServerType: String?
     let mullvadExitIPHostname: String?
