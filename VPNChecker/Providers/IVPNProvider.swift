@@ -11,12 +11,17 @@ nonisolated struct IVPNProvider: VPNProvider {
     let providerName = "IVPN"
 
     private let apiURL = URL(string: "https://api.ivpn.net/v4/geo-lookup")!
+    private let session: URLSession
+
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
 
     func checkStatus() async throws -> VPNStatus {
         let data: Data
         let response: URLResponse
         do {
-            (data, response) = try await URLSession.shared.data(from: apiURL)
+            (data, response) = try await session.data(from: apiURL)
         } catch {
             throw VPNProviderError.networkError(error)
         }
