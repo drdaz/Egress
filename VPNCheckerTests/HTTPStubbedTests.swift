@@ -180,6 +180,7 @@ struct HTTPStubbedTests {
             #expect(status.providerName == "AirVPN")
             #expect(status.country == "Sweden")
             #expect(status.city == nil)
+            #expect(status.serverName == "Lupus")
         }
 
         /// Regression: guards against a null/absent `geo` object when the API is hit
@@ -193,6 +194,7 @@ struct HTTPStubbedTests {
             #expect(!status.isConnected)
             #expect(status.providerName == "None")
             #expect(status.country == nil)
+            #expect(status.serverName == nil)
         }
 
         /// A non-"ok" result is a business-logic failure, not a parse failure, so

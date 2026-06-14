@@ -46,7 +46,7 @@ nonisolated struct AirVPNProvider: VPNProvider {
             city: airVPNResponse.geoAdditional?.cityName,
             organization: airVPNResponse.geoAdditional?.ispName,
             providerName: airVPNResponse.airvpn ? providerName : "None",
-            serverName: nil
+            serverName: airVPNResponse.serverName
         )
     }
 }
@@ -57,11 +57,13 @@ private nonisolated struct AirVPNResponse: Codable {
     let ip: String
     let airvpn: Bool
     let result: String
+    let serverName: String?
     let geo: GeoResponse?
     let geoAdditional: GeoAdditionalResponse?
 
     enum CodingKeys: String, CodingKey {
         case ip, airvpn, result, geo
+        case serverName = "server_name"
         case geoAdditional = "geo_additional"
     }
 }
