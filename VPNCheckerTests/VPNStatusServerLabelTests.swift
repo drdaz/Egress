@@ -40,9 +40,17 @@ struct VPNStatusServerLabelTests {
         #expect(status(serverName: "   ", ipAddress: "203.0.113.7").serverOrIP == "203.0.113.7")
     }
 
-    /// The fallback is independent of connection state — a not-connected status
-    /// (no server name) still surfaces the egress IP rather than a blank line.
-    @Test func fallsBackToIPRegardlessOfConnectedState() {
+    /// serverOrIP is connection-agnostic by design — a pure formatting helper, not
+    /// a connection-state decision (gating it on isConnected was deliberately
+    /// declined). With no server name it returns the IP whether connected or not...
+    @Test func fallsBackToIPWhenDisconnectedAndNoServerName() {
         #expect(status(serverName: nil, ipAddress: "203.0.113.7", isConnected: false).serverOrIP == "203.0.113.7")
+    }
+
+    /// ...and a (e.g. stale) server name still takes precedence even when
+    /// disconnected, rather than reverting to the IP. The view, not this helper,
+    /// is responsible for connection-state presentation.
+    @Test func serverNameTakesPrecedenceEvenWhenDisconnected() {
+        #expect(status(serverName: "se-sto-wg-001", ipAddress: "203.0.113.7", isConnected: false).serverOrIP == "se-sto-wg-001")
     }
 }
