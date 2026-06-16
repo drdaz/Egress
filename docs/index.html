@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Egress — Verify your VPN, at a glance</title>
+<meta name="description" content="Egress is a widget that confirms you're connected through the VPN or network you expect — right from your home screen or menu bar. Free, open-source, no tracking.">
+<meta property="og:title" content="Egress — Verify your VPN, at a glance">
+<meta property="og:description" content="A widget that confirms you're exiting through the VPN or network you expect. Free, open-source, no tracking.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Egress</a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="support.html">Support</a>
+      <a href="https://github.com/drdaz/Egress">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <h1>Know your VPN is actually on — at a glance.</h1>
+      <p class="lead">A VPN <em>promises</em> your traffic is going through it. Egress <em>confirms</em> it — right from a home-screen or menu-bar widget. No app to open.</p>
+      <div class="cta-row">
+        <a class="btn" href="#how">See how it works</a>
+        <a class="btn secondary" href="https://github.com/drdaz/Egress">View source</a>
+      </div>
+      <p class="tag" style="margin-top:18px">Free · Open-source · No tracking · iPhone &amp; Mac</p>
+    </div>
+
+    <div aria-hidden="true">
+      <div class="widget">
+        <div class="widget-head">
+          <span class="label">Egress</span>
+          <span class="status ok"><span class="pip"></span> Connected</span>
+        </div>
+        <div class="row"><span class="k">Expecting</span><span class="v">Mullvad</span></div>
+        <div class="row"><span class="k">Exit</span><span class="v">Stockholm, SE</span></div>
+      </div>
+      <div class="widget">
+        <div class="widget-head">
+          <span class="label">Egress</span>
+          <span class="status bad"><span class="pip"></span> Not connected</span>
+        </div>
+        <div class="row"><span class="k">Expecting</span><span class="v">Work VPN</span></div>
+        <div class="row"><span class="k">Exit</span><span class="v">unverified</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="block" id="how">
+  <div class="wrap">
+    <h2>Confirmed at the source — not guessed</h2>
+    <p class="sub">Egress doesn't infer your location from your IP. It verifies the thing that actually matters: are you exiting through the egress you expect?</p>
+    <div class="features">
+      <div class="feature">
+        <h3>For supported providers</h3>
+        <p>Egress asks the provider's own connection check — the same one they host on their site to tell you "you are connected." An authoritative answer, surfaced right in your widget.</p>
+      </div>
+      <div class="feature">
+        <h3>For everything else</h3>
+        <p>Add a Custom Egress and match against the public IP ranges you define. Use it for an unlisted VPN — or to confirm you're on your work or home network before you assume you are.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="features">
+  <div class="wrap">
+    <h2>Built to be glanced at, and trusted</h2>
+    <p class="sub">The whole point is that you don't have to think about it.</p>
+    <div class="features">
+      <div class="feature">
+        <h3>Glance, don't open</h3>
+        <p>Pin the widget and get passive, continuous confirmation — no launching, no tapping, no logging in. When something's off, you'll know before you assume you're protected.</p>
+      </div>
+      <div class="feature">
+        <h3>iPhone and Mac</h3>
+        <p>Home-screen widget on iOS, menu-bar on macOS. Your custom setups sync privately over iCloud. Set it up once.</p>
+      </div>
+      <div class="feature">
+        <h3>Private by design</h3>
+        <p>No tracking, no accounts, no phoning home. Egress is fully open-source — so "no tracking" is something you can verify, not just take our word for. That's rather the point.</p>
+      </div>
+      <div class="feature">
+        <h3>Free</h3>
+        <p>No subscription, no paywall, no catch.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="screens">
+  <div class="wrap">
+    <h2>See it in place</h2>
+    <p class="sub">Screenshots from the App Store listing.</p>
+    <div class="shots">
+      <div class="shot">Home-screen widget — connected</div>
+      <div class="shot">The moment it drops</div>
+      <div class="shot">Provider check result</div>
+    </div>
+    <p class="tag" style="margin-top:16px">Artwork placeholders — drop real screenshots into <code>docs/assets/</code> and replace these tiles.</p>
+  </div>
+</section>
+
+<section class="block cta-strip">
+  <div class="wrap">
+    <h2>Stop assuming. Start confirming.</h2>
+    <p>Egress is free and open-source, for iPhone and Mac.</p>
+    <div class="cta-row" style="justify-content:center">
+      <a class="btn" href="https://github.com/drdaz/Egress">View on GitHub</a>
+      <a class="btn secondary" href="support.html">Get support</a>
+    </div>
+    <p class="tag" style="margin-top:16px">App Store link coming at launch.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Egress</span>
+    <span>
+      <a href="privacy.html">Privacy</a> ·
+      <a href="support.html">Support</a> ·
+      <a href="https://github.com/drdaz/Egress">GitHub</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>

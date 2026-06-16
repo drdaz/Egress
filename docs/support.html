@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support — Egress</title>
+<meta name="description" content="Get help with Egress. Report issues, ask questions, and read answers to common questions.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Egress</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="https://github.com/drdaz/Egress">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap legal">
+  <h1>Support</h1>
+  <p class="updated">We're happy to help.</p>
+
+  <div class="callout">
+    <strong>Need help or found a bug?</strong> The best way to reach us is
+    <a href="https://github.com/drdaz/Egress/issues">GitHub Issues</a> — you can report a problem,
+    request a provider, or ask a question there.
+  </div>
+
+  <h2>Frequently asked questions</h2>
+
+  <h2 style="font-size:1.1rem">What does Egress do?</h2>
+  <p class="muted">Egress is a widget that confirms whether your traffic is exiting through the VPN
+  or network you expect. For supported providers it reads the provider's own "you are connected"
+  check; for anything else, it matches your public IP against ranges you define.</p>
+
+  <h2 style="font-size:1.1rem">Which providers are supported?</h2>
+  <p class="muted">Egress supports several VPN providers out of the box, and a Custom Egress option
+  that works with any VPN or network you can identify by its public IP ranges. Missing a provider?
+  <a href="https://github.com/drdaz/Egress/issues">Request it on GitHub.</a></p>
+
+  <h2 style="font-size:1.1rem">Does it work on iPhone and Mac?</h2>
+  <p class="muted">Yes. Egress runs on both, with a home-screen widget on iOS and a menu-bar item on
+  macOS. Your custom setups sync across your devices over iCloud.</p>
+
+  <h2 style="font-size:1.1rem">Is it really free?</h2>
+  <p class="muted">Yes — free and open-source, with no subscription, paywall, or ads. You can read
+  the full source on <a href="https://github.com/drdaz/Egress">GitHub</a>.</p>
+
+  <h2 style="font-size:1.1rem">Does Egress collect my data?</h2>
+  <p class="muted">No. Egress has no servers, accounts, or trackers, and collects nothing about you.
+  See the <a href="privacy.html">Privacy Policy</a> for the details.</p>
+
+  <h2 style="font-size:1.1rem">It says I'm not connected, but I am — what gives?</h2>
+  <p class="muted">The current version matches your exit using IPv4. On an IPv6-only network the check
+  is handled gracefully rather than matched, so a result may be inconclusive; full IPv6 matching is
+  on the way. If you think something else is wrong, please
+  <a href="https://github.com/drdaz/Egress/issues">open an issue</a> with the details.</p>
+
+  <h2>Contributing</h2>
+  <p>Egress is open-source. Bug reports, provider requests, and pull requests are welcome on
+  <a href="https://github.com/drdaz/Egress">GitHub</a>.</p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Egress</span>
+    <span>
+      <a href="privacy.html">Privacy</a> ·
+      <a href="support.html">Support</a> ·
+      <a href="https://github.com/drdaz/Egress">GitHub</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,1 +1,7 @@
-VPNChecker.xcodeproj/xcuserdata
+*.xcodeproj/xcuserdata/
+
+# Internal working notes — not for the public repo
+marketing/
+
+# Local Claude Code settings (machine-specific)
+.claude/settings.local.json

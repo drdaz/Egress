@@ -39,7 +39,7 @@ struct OnboardingView: View {
             Text("Welcome to Egress")
                 .font(.title2)
                 .fontWeight(.bold)
-            Text("Know where you're surfacing from - at a glance. Egress checks that your traffic is exiting to the internet where you expect, right from a widget.")
+            Text("Know where you're surfacing from — at a glance. Egress confirms you're exiting through the VPN or network you expect, right from a widget.")
                 .foregroundStyle(.secondary)
             Text("Pick a VPN provider below, or add a custom egress check for anything that's not listed. Change it any time in Settings.")
                 .foregroundStyle(.secondary)

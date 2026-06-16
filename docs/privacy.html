@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — Egress</title>
+<meta name="description" content="Egress collects nothing. No tracking, no accounts, no developer-operated servers. Open-source, so you can verify it.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Egress</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="support.html">Support</a>
+      <a href="https://github.com/drdaz/Egress">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap legal">
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: 16 June 2026</p>
+
+  <div class="callout">
+    <strong>The short version:</strong> Egress does not collect, transmit, or store your personal
+    data. There are no accounts, no analytics, no trackers, and no servers operated by us. Because
+    Egress is open-source, you don't have to take our word for it — you can read the code.
+  </div>
+
+  <h2>Who we are</h2>
+  <p>Egress is a free, open-source utility for iPhone and Mac that confirms whether your traffic is
+  exiting through the VPN or network you expect. This policy explains how the app handles data. It
+  applies to the Egress apps and this website.</p>
+
+  <h2>What we collect</h2>
+  <p><strong>Nothing.</strong> Egress has no developer-operated servers and no backend. We do not
+  collect, receive, log, or store any personal information about you. We have no way to identify you
+  and no account for you to create.</p>
+
+  <h2>Network requests the app makes</h2>
+  <p>To do its job, Egress makes network requests directly from your device to third-party services.
+  These requests do not pass through any server of ours — we don't operate one. But by the nature of
+  any internet request, the service you contact will see your device's public IP address. We don't
+  control these services, and each is governed by its own privacy policy.</p>
+  <ul>
+    <li><strong>Determining your public IP (Custom Egress).</strong> To check a Custom Egress, Egress
+    needs your device's current public IP address. It requests this from a third-party lookup service,
+    <a href="https://ipwho.is/">ipwho.is</a>, which returns your IP address and an approximate location
+    (such as country and city). Egress then compares that IP against the ranges you defined — the
+    comparison happens on your device. Egress sends ipwho.is nothing that identifies you beyond the
+    request itself.</li>
+    <li><strong>Provider connection checks (supported providers).</strong> When you select a supported
+    provider, Egress queries that provider's own connection-check endpoint — for example
+    <span class="muted">am.i.mullvad.net</span> (Mullvad), <span class="muted">api.ivpn.net</span>
+    (IVPN), or <span class="muted">airvpn.org</span> (AirVPN). The request goes directly from your
+    device to that provider, which reports whether you're connected along with details such as your IP
+    and the server's location. These are governed by the provider's own privacy policy.</li>
+  </ul>
+  <p class="muted">The complete, current list of endpoints Egress contacts is visible in the
+  open-source code. Egress makes no advertising or analytics requests of any kind.</p>
+
+  <h2>What's stored on your device</h2>
+  <ul>
+    <li>The egress you've selected and any Custom Egress definitions you create are stored locally on
+    your device.</li>
+    <li>If you are signed in to iCloud, your settings may sync across your devices through Apple's
+    iCloud (key-value storage). This data is handled by Apple under Apple's privacy policy; it is not
+    sent to us and we cannot access it.</li>
+  </ul>
+
+  <h2>No tracking</h2>
+  <p>Egress contains no third-party analytics, advertising, or tracking SDKs. It does not build a
+  profile of you, does not track you across apps or websites, and requests no advertising identifier.</p>
+
+  <h2>Children</h2>
+  <p>Egress does not collect personal data from anyone, including children.</p>
+
+  <h2>This website</h2>
+  <p>This site is hosted on GitHub Pages and loads no third-party fonts, analytics, or trackers.
+  GitHub may collect standard server logs (such as IP addresses) as part of serving the page; see
+  GitHub's privacy statement for details.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If this policy changes, the updated version will be posted here with a new date above. Because
+  the site is open-source, every change is also visible in the project's version history.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about privacy? Open an issue on
+  <a href="https://github.com/drdaz/Egress/issues">GitHub</a>.</p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Egress</span>
+    <span>
+      <a href="privacy.html">Privacy</a> ·
+      <a href="support.html">Support</a> ·
+      <a href="https://github.com/drdaz/Egress">GitHub</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>
