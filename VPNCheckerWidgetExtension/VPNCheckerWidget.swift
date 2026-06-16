@@ -150,22 +150,10 @@ struct SmallVPNWidgetView: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
 
-                if status.isConnected {
-                    if let server = status.serverName {
-                        Text(server)
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                            .lineLimit(1)
-                    } else if let country = status.country {
-                        Text(country)
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
-                } else {
-                    Text(status.ipAddress)
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                }
+                Text(status.serverOrIP)
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .lineLimit(1)
             }
             .padding()
         } else {
@@ -207,29 +195,16 @@ struct MediumVPNWidgetView: View {
                     .foregroundStyle(status.isConnected ? .green : .red)
 
                 VStack(alignment: .leading, spacing: 6) {
-                    if status.isConnected {
-                        Text("Connected")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                        
-                        Text(entry.selectedProviderName)
-                            .font(.subheadline)
+                    Text(status.isConnected ? "Connected" : "Not connected")
+                        .font(.headline)
+                        .fontWeight(.bold)
 
-                        if let server = status.serverName {
-                            Text(server)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                    } else {
-                        Text("Not connected")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                        Text(entry.selectedProviderName)
-                            .font(.subheadline)
-                        Text(status.ipAddress)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
+                    Text(entry.selectedProviderName)
+                        .font(.subheadline)
+
+                    Text(status.serverOrIP)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
 
                 Spacer()

@@ -17,16 +17,17 @@ nonisolated struct VPNStatus: Codable, Equatable {
     let organization: String?
     let providerName: String
     let serverName: String?
-    
+}
+
+/// Presentation-related logic for VPNStatus
+extension VPNStatus {
     /// "City, Country" from whichever of the two are present and non-blank,
     /// or just the one that is (e.g. a city with no country resolves to the
     /// city alone); nil when neither has a usable value. Guards against APIs
     /// that return an empty string (e.g. IVPN's `"city":""`), which would
     /// otherwise render as a dangling ", Country".
     private var cityCountry: String? {
-        let parts = [city, country]
-            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
+        let parts = [city, country].compactMap(\.nonBlank)
         return parts.isEmpty ? nil : parts.joined(separator: ", ")
     }
 
@@ -38,7 +39,15 @@ nonisolated struct VPNStatus: Codable, Equatable {
         guard isConnected else { return "Not Connected" }
         return "Connected to \(providerName)"
     }
-    
+
+    /// The most specific identifier for the current egress: the provider's server
+    /// name when it supplies a non-blank one (Mullvad/AirVPN), otherwise the egress
+    /// IP — which is always present. Lets compact surfaces like the widget fall back
+    /// to the IP instead of rendering blank when there's no usable server name.
+    var serverOrIP: String {
+        serverName.nonBlank ?? ipAddress
+    }
+
     var multilineDescription: String {
         guard isConnected else { return "Not Connected" }
         
@@ -46,7 +55,7 @@ nonisolated struct VPNStatus: Codable, Equatable {
         
         parts.append("Connected to \(providerName)")
         
-        if let server = serverName {
+        if let server = serverName.nonBlank {
             parts.append(server)
         } else if let location = serverLocation {
             parts.append(location)
@@ -57,6 +66,17 @@ nonisolated struct VPNStatus: Codable, Equatable {
         }
 
         return parts.isEmpty ? "Connected" : parts.joined(separator: "\n")
+    }
+}
+
+private extension Optional where Wrapped == String {
+    /// The trimmed value, or nil when absent or blank — for API fields that can
+    /// arrive empty (e.g. IVPN's `"city":""`, or a `"server_name":""`). Centralises
+    /// the "blank means absent" rule shared by the presentation helpers above.
+    var nonBlank: String? {
+        guard let trimmed = self?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !trimmed.isEmpty else { return nil }
+        return trimmed
     }
 }
 
