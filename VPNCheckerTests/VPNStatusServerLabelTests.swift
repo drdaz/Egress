@@ -2,7 +2,8 @@
 //  VPNStatusServerLabelTests.swift
 //  EgressTests
 //
-//  Covers VPNStatus.serverOrIP — the widget's secondary-line fallback.
+//  Covers VPNStatus.serverOrIP (the widget's secondary-line fallback) and
+//  serverNameLabel (the app's Server row source).
 //
 
 import Foundation
@@ -52,5 +53,24 @@ struct VPNStatusServerLabelTests {
     /// is responsible for connection-state presentation.
     @Test func serverNameTakesPrecedenceEvenWhenDisconnected() {
         #expect(status(serverName: "se-sto-wg-001", ipAddress: "203.0.113.7", isConnected: false).serverOrIP == "se-sto-wg-001")
+    }
+
+    // serverNameLabel — the app's Server row source; nil when blank/absent so no
+    // empty row renders.
+
+    @Test func serverNameLabelPresentWhenNonBlank() {
+        #expect(status(serverName: "Lupus", ipAddress: "1.2.3.4").serverNameLabel == "Lupus")
+    }
+
+    @Test func serverNameLabelNilWhenAbsent() {
+        #expect(status(serverName: nil, ipAddress: "203.0.113.7").serverNameLabel == nil)
+    }
+
+    @Test func serverNameLabelNilWhenEmpty() {
+        #expect(status(serverName: "", ipAddress: "203.0.113.7").serverNameLabel == nil)
+    }
+
+    @Test func serverNameLabelNilWhenWhitespace() {
+        #expect(status(serverName: "   ", ipAddress: "203.0.113.7").serverNameLabel == nil)
     }
 }
