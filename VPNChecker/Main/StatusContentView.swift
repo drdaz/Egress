@@ -83,7 +83,7 @@ struct VPNStatusView: View {
 
                 InfoRow(label: "IP Address", value: status.ipAddress)
 
-                if let server = status.serverName {
+                if let server = status.serverNameLabel {
                     InfoRow(label: "Server", value: server)
                 }
 

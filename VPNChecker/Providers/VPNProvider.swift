@@ -48,6 +48,12 @@ extension VPNStatus {
         serverName.nonBlank ?? ipAddress
     }
 
+    /// The server name when non-blank, else nil — for the app's Server row, so a
+    /// `"server_name":""` from a provider doesn't render an empty row.
+    var serverNameLabel: String? {
+        serverName.nonBlank
+    }
+
     var multilineDescription: String {
         guard isConnected else { return "Not Connected" }
         
