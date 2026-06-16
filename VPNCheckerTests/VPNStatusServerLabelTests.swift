@@ -2,7 +2,8 @@
 //  VPNStatusServerLabelTests.swift
 //  EgressTests
 //
-//  Covers VPNStatus.serverOrIP — the widget's secondary-line fallback.
+//  Covers VPNStatus.serverOrIP (the widget's secondary-line fallback) and
+//  serverNameLabel (the app's Server row source).
 //
 
 import Foundation
