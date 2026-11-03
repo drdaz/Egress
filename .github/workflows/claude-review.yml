@@ -1,19 +1,44 @@
 name: Claude Code Review
 
+# On-demand PR review: comment `/review` on a pull request to run it.
+# Anything after `/review` is passed along as extra focus
+# (e.g. `/review the widget timeline`).
+# Only the repo owner, members, and collaborators can trigger it.
 on:
-  pull_request:
-    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: claude-review-${{ github.event.issue.number }}
+  cancel-in-progress: true
 
 jobs:
   review:
+    if: >-
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/review') &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
+      issues: write
       id-token: write
     steps:
+      # Acknowledge the command so it's visible the review has started.
+      - name: React to comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+        run: |
+          gh api --method POST \
+            "repos/${{ github.repository }}/issues/comments/$COMMENT_ID/reactions" \
+            -f content=eyes
+
+      # issue_comment runs against the default branch, so check out the PR head.
       - uses: actions/checkout@v5
         with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
           fetch-depth: 1
 
       - uses: anthropics/claude-code-action@v1
@@ -21,9 +46,11 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
+            PR NUMBER: ${{ github.event.issue.number }}
+            REQUEST: ${{ github.event.comment.body }}
 
             Review this pull request. It's a Swift / Xcode app (iOS + macOS).
+            If REQUEST has text after `/review`, treat it as extra focus.
             Focus on:
             - Correctness bugs and logic errors
             - Concurrency / actor-isolation issues (this project defaults to
